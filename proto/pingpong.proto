@@ -1,0 +1,13 @@
+syntax = "proto3";
+// Namespace
+package zq.proto;
+
+message Ping {
+  int32 id = 1;
+  string msg = 2;
+}
+
+message Pong {
+  int32 id = 1;
+  string reply = 2;
+}
