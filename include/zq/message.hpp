@@ -166,12 +166,12 @@ namespace zq {
   inline std::string as_string(const Message& m) {
     const char* data = reinterpret_cast<const char*>(m.data());
     return std::string{ data, m.size() };
-  };
+  }
 
   inline std::string_view as_string_view(const Message& m) {
     const char* data = reinterpret_cast<const char*>(m.data());
     return std::string_view{ data, m.size() };
-  };
+  }
 
   // restore typed messages
 
