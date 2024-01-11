@@ -14,3 +14,27 @@ If vcpkg is not installed in `~/vcpkg`, then set the environment variable VCPKG_
 You can run the code on Linux Windows and Mac if you have a compiler that is C++20 capable.
 
 All the code is MPL 2.0 licensed.
+
+## Building the project
+
+The project supports [CMake presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
+You may explore the presets available on your system by executing
+
+```bash
+cmake --list-presets
+```
+
+Once you have decided which preset you want to use, configure and build like so:
+
+```bash
+cmake --preset=<name>
+cmake --build --preset=<name>
+```
+
+## Running tests
+
+After the project has been built, you are ready to run the tests:
+
+```bash
+ctest --preset=<name>
+```
