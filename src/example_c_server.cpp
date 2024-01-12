@@ -30,7 +30,9 @@ int main (void)
     int rc = zmq_bind (responder, "tcp://*:5555");
     assert (rc == 0);
     printf ("start loop\n");
-    while (1) {
+    int i = 0;
+    while (i++ < 3) {
+
         char buffer [10];
         zmq_recv (responder, buffer, 10, 0);
         printf ("Received Hello\n");
@@ -41,5 +43,6 @@ int main (void)
         #endif
         zmq_send (responder, "World", 5, 0);
     }
+    printf ("Done with 3 replies\n");
     return 0;
 }
