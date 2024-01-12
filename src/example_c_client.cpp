@@ -1,7 +1,11 @@
 #include <zmq.h>
 #include <string.h>
 #include <stdio.h>
+#ifdef _WIN32
+#include <Windows.h>
+#else
 #include <unistd.h>
+#endif
 
 int main (void)
 {
