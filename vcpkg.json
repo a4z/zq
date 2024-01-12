@@ -5,8 +5,6 @@
     "strong-type",
     "fmt",
     "protobuf",
-    "concurrentqueue",
-    "readerwriterqueue",
     {
       "name": "zeromq",
       "features": [ "sodium", "websockets" ]
