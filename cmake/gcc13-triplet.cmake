@@ -1,0 +1,13 @@
+get_filename_component(TRIPLET_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
+set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE ${TRIPLET_DIR}/gcc13-toolchain.cmake)
+
+set(VCPKG_CRT_LINKAGE dynamic)
+set(VCPKG_LIBRARY_LINKAGE static)
+
+if (APPLE)
+    set(CMAKE_EXE_LINKER_FLAGS "-Wl,-ld_classic")
+    set(VCPKG_TARGET_ARCHITECTURE arm64)
+    set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
+else()
+    set(VCPKG_TARGET_ARCHITECTURE x64)
+endif()

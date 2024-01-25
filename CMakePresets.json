@@ -35,14 +35,14 @@
     },
     {
       "inherits": "base",
-      "name": "brew-gcc",
-      "displayName": "Brew Gcc",
-      "description": "Gcc on Mac, Ninja Multi-Config",
+      "name": "gcc13",
+      "displayName": "Gcc-13",
+      "description": "Gcc-13, Ninja Multi-Config",
       "generator": "Ninja Multi-Config",
-      "toolchainFile": "${sourceDir}/cmake/brew-gcc-vcpkg.cmake",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-osx-gcc",
-        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake"
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/gcc13-toolchain.cmake",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/cmake",
+        "VCPKG_TARGET_TRIPLET": "gcc13-triplet"
       }
     }
   ],
@@ -78,13 +78,13 @@
       "configuration": "Release"
     },
     {
-      "name": "brew-gcc",
-      "configurePreset": "brew-gcc",
+      "name": "gcc13",
+      "configurePreset": "gcc13",
       "configuration": "Debug"
     },
     {
-      "name": "brew-gcc-release",
-      "configurePreset": "brew-gcc",
+      "name": "gcc13-release",
+      "configurePreset": "gcc13",
       "configuration": "Release"
     }
   ],
@@ -127,14 +127,15 @@
       "configuration": "Release"
     },
     {
-      "name": "brew-gcc",
-      "configurePreset": "brew-gcc",
+      "name": "gcc13",
+      "configurePreset": "gcc13",
       "configuration": "Debug"
     },
     {
-      "name": "brew-gcc-release",
-      "inherits": "brew-gcc",
+      "name": "gcc13-release",
+      "inherits": "gcc13",
       "configuration": "Release"
     }
+
   ]
 }
