@@ -28,6 +28,12 @@ add_doctest(test-ctx0
       ctx0/ztx0_test.cpp
 )
 
+add_doctest(test-xtra
+    SOURCES
+       xtra/structs_test.cpp
+#        xtra/tuple_test.cpp
+# no tuple yet, it's not trivial copiable
+)
 
 
 # non windows

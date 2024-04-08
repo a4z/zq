@@ -16,15 +16,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # os: [ubuntu-latest, macos-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
             vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: ninja
-          # - os: macos-latest
-          #   vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
-          #   cmake_preset: ninja
+          - os: macos-latest
+            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
+            cmake_preset: ninja
 
     steps:
       - uses: actions/checkout@v3
@@ -83,5 +82,5 @@ jobs:
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-${{ github.workflow }}
           path: build/ninja/coverage/
