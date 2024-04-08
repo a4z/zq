@@ -38,6 +38,8 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           brew install ninja
+          brew install lcov
+
 
       - uses: lukka/get-cmake@latest
       - name: Dump the content of $RUNNER_TEMP
