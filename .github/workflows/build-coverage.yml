@@ -18,9 +18,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         include:
-          - os: windows-latest
-            vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
-            cmake_preset: msvc22
           - os: ubuntu-latest
             vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
             cmake_preset: ninja
