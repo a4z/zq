@@ -30,13 +30,12 @@ option(COVERAGE "Enable coverage reporting" OFF)
 
 if(COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-    set(COVERAGE_BRANCHES "--rc lcov_branch_coverage=0")
-    separate_arguments(COVERAGE_BRANCHES)
+    set(COVERAGE_BRANCHES "--rc branch_coverage=0")
     set(COVERAGE_WARNINGS "--ignore-errors gcov")
     if(APPLE)
-        set(COVERAGE_BRANCHES "--rc branch_coverage=0")
         set(COVERAGE_WARNINGS "--ignore-errors gcov --ignore-errors inconsistent --ignore-errors unused")
     endif()
+    separate_arguments(COVERAGE_BRANCHES)
     separate_arguments(COVERAGE_WARNINGS)
     add_custom_target(coverage
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage
