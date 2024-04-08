@@ -37,6 +37,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build
 
+      - name: Install dependencies on Mac
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install lcov autoconf automake libtool
+
       - uses: lukka/get-cmake@latest
       - name: Dump the content of $RUNNER_TEMP
         run: find $RUNNER_TEMP

@@ -37,9 +37,7 @@ jobs:
       - name: Install dependencies on Mac
         if: matrix.os == 'macos-latest'
         run: |
-          brew install ninja
-          brew install lcov
-
+          brew install ninja lcov autoconf automake libtool
 
       - uses: lukka/get-cmake@latest
       - name: Dump the content of $RUNNER_TEMP
