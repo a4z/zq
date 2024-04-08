@@ -23,7 +23,7 @@ jobs:
             cmake_preset: ninja
           - os: macos-latest
             vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
-            cmake_preset: xcode
+            cmake_preset: ninja
 
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,12 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
+          sudo apt-get install -y cmake ninja-build lcov
+
+      - name: Install dependencies on Mac
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install ninja
 
       - uses: lukka/get-cmake@latest
       - name: Dump the content of $RUNNER_TEMP
