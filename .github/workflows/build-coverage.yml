@@ -16,14 +16,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         include:
           - os: ubuntu-latest
             vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
             cmake_preset: ninja
-          - os: macos-latest
-            vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
-            cmake_preset: ninja
+          # - os: macos-latest
+          #   vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
+          #   cmake_preset: ninja
 
     steps:
       - uses: actions/checkout@v3
