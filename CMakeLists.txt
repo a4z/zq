@@ -32,16 +32,19 @@ if(COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(COVERAGE_BRANCHES "--rc branch_coverage=0")
     set(COVERAGE_WARNINGS "--ignore-errors gcov")
+    set(GENHTML_WARNINGS "")
     if(APPLE)
         set(COVERAGE_WARNINGS "--ignore-errors gcov --ignore-errors inconsistent --ignore-errors unused")
+        set(GENHTML_WARNINGS "--ignore-errors inconsistent")
     endif()
     separate_arguments(COVERAGE_BRANCHES)
     separate_arguments(COVERAGE_WARNINGS)
+    separate_arguments(GENHTML_WARNINGS)
     add_custom_target(coverage
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage
     COMMAND lcov  --directory . --capture --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info ${COVERAGE_WARNINGS} ${COVERAGE_BRANCHES}
     COMMAND lcov --remove ${CMAKE_BINARY_DIR}/coverage/coverage.info '/usr/*' '*/tests/*' '*/vcpkg_installed/*' '${CMAKE_SOURCE_DIR}/external/*' --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned ${COVERAGE_WARNINGS} ${COVERAGE_BRANCHES}
-    COMMAND genhtml ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned --output-directory ${CMAKE_BINARY_DIR}/coverage ${COVERAGE_WARNINGS} ${COVERAGE_BRANCHES}
+    COMMAND genhtml ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned --output-directory ${CMAKE_BINARY_DIR}/coverage ${GENHTML_WARNINGS} ${COVERAGE_BRANCHES}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
