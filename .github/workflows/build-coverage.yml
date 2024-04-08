@@ -11,7 +11,7 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-${{ github.workflow }}
+    name: ${{ matrix.os }}-${{ github.workflow }}-converage
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
