@@ -19,13 +19,13 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
+            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: msvc22
           - os: ubuntu-latest
-            vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
+            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: ninja
           - os: macos-latest
-            vcpkgCommitId: '9f03078bdcbab3ad8c1e3927c40c3fb48e42501f'
+            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: xcode
 
     steps:
