@@ -30,14 +30,18 @@ option(COVERAGE "Enable coverage reporting" OFF)
 
 if(COVERAGE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
-
     set(COVERAGE_BRANCHES "--rc lcov_branch_coverage=0")
     separate_arguments(COVERAGE_BRANCHES)
+    set(COVERAGE_WARNINGS "--ignore-errors gcov")
+    if(APPLE)
+        set(COVERAGE_WARNINGS "--ignore-errors gcov --ignore-errors inconsistent --ignore-errors unused")
+    endif()
+    separate_arguments(COVERAGE_WARNINGS)
     add_custom_target(coverage
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage
-    COMMAND lcov  --directory . --capture --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info --ignore-errors gcov --ignore-errors inconsistent --ignore-errors unused ${COVERAGE_BRANCHES}
-    COMMAND lcov --remove ${CMAKE_BINARY_DIR}/coverage/coverage.info '/usr/*' '*/tests/*' '*/vcpkg_installed/*' '${CMAKE_SOURCE_DIR}/external/*' --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned --ignore-errors gcov --ignore-errors inconsistent --ignore-errors unused ${COVERAGE_BRANCHES}
-    COMMAND genhtml ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned --output-directory ${CMAKE_BINARY_DIR}/coverage --ignore-errors inconsistent --ignore-errors unmapped ${COVERAGE_BRANCHES}
+    COMMAND lcov  --directory . --capture --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info ${COVERAGE_WARNINGS} ${COVERAGE_BRANCHES}
+    COMMAND lcov --remove ${CMAKE_BINARY_DIR}/coverage/coverage.info '/usr/*' '*/tests/*' '*/vcpkg_installed/*' '${CMAKE_SOURCE_DIR}/external/*' --output-file ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned ${COVERAGE_WARNINGS} ${COVERAGE_BRANCHES}
+    COMMAND genhtml ${CMAKE_BINARY_DIR}/coverage/coverage.info.cleaned --output-directory ${CMAKE_BINARY_DIR}/coverage  ${COVERAGE_BRANCHES}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
