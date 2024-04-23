@@ -41,7 +41,7 @@ struct fmt::formatter<zq::ErrMsg> {
     }
 
     auto format(const zq::ErrMsg& e, fmt::format_context& ctx) {
-        return fmt::format_to(ctx.out(), "{}, {})", e.error, e.message);
+        return fmt::format_to(ctx.out(), "{}, {}", e.error, e.message);
     }
 };
 
@@ -61,6 +61,6 @@ struct fmt::formatter<std::runtime_error> {
     }
 
     auto format(const std::runtime_error& e, fmt::format_context& ctx) {
-        return fmt::format_to(ctx.out(), "{})", e.what());
+        return fmt::format_to(ctx.out(), "{}", e.what());
     }
 };
