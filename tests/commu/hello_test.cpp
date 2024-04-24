@@ -4,6 +4,7 @@
 #include "pingpong.pb.h"
 #include <thread>
 #include <chrono>
+#include <fmt/format.h>
 
 namespace {
       // startup times on Windows are a problem, they take too long,
@@ -128,4 +129,26 @@ SCENARIO("Make a hello world send receive call") {
       }
     }
   }
+}
+
+SCENARIO("Trying to create a socket without valid context returns error message")
+{
+	GIVEN("The invalid ZMQ context")
+	{
+		auto maybe_context = zq::mk_context();
+
+		REQUIRE( maybe_context.has_value() );
+		REQUIRE( maybe_context->close() == zq::NoError );
+
+		WHEN("Trying to create a (Request) socket")
+		{
+			auto maybe_socket{ maybe_context->connect(zq::SocketType::REQ, "ipc://localhost_5555") };
+
+			THEN("The error message is returned")
+			{
+				REQUIRE_FALSE( maybe_socket.has_value() );
+				REQUIRE( doctest::Contains{"Bad address"}.checkWith( fmt::format("{}", maybe_socket.error()).c_str() ) );
+			}
+		}
+	}
 }
