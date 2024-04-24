@@ -75,7 +75,9 @@ namespace zq {
         }
       }
       SocketPointer sp{ z_socket };
-      return Socket{std::move(sp)};
+	  /* Explicitly create the expected objects, otherwise, the return value optimization
+		 will not be invoked and the Socket's move constructor and destructor will be called. */
+      return tl::expected<Socket, ErrMsg>{ std::move(sp) };
     }
 
 
