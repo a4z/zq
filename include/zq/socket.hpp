@@ -10,6 +10,8 @@
 
 namespace zq {
 
+// Since socket resets the pointer, this is never called in zq code
+// but to be technically correct, this deleter is needed for the unique_ptr
   struct ZmqSocketClose {
     void operator()(void* ptr) const {
       if (ptr) {
@@ -43,7 +45,8 @@ namespace zq {
         if (zmq_close(socket_ptr.get()) != 0) {
           return Error{ zmq_errno() };
         }
-        (void)socket_ptr.release();
+        [[maybe_unused]] auto _ = socket_ptr.release();
+        socket_ptr = nullptr;
       }
       return NoError;
     }

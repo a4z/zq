@@ -32,6 +32,7 @@ add_doctest(test-xtra
     SOURCES
        xtra/structs_test.cpp
 #        xtra/tuple_test.cpp
+       xtra/raise_coverate_test.cpp
 # no tuple yet, it's not trivial copiable
 )
 
