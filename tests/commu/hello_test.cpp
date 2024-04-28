@@ -1,21 +1,20 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
 // #include <zq/typename.hpp>
-#include "pingpong.pb.h"
-#include <chrono>
 #include <fmt/format.h>
+#include <chrono>
 #include <thread>
+#include "pingpong.pb.h"
 
 namespace {
-// startup times on Windows are a problem, they take too long,
-// this can cause test timeout
-using namespace std::chrono_literals;
-auto await_time = 1000ms;
-// auto await_time = std::chrono::milliseconds(1000);
-} // namespace
+  // startup times on Windows are a problem, they take too long,
+  // this can cause test timeout
+  using namespace std::chrono_literals;
+  auto await_time = 1000ms;
+  // auto await_time = std::chrono::milliseconds(1000);
+}  // namespace
 
 SCENARIO("Make a hello world send receive call") {
-
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
@@ -82,7 +81,6 @@ SCENARIO("Make a hello world send receive call") {
 }
 
 SCENARIO("Make a hello world send receive call") {
-
   auto context = zq::mk_context();
 
   GIVEN("a request and a reply socket with proto messages") {
@@ -104,7 +102,6 @@ SCENARIO("Make a hello world send receive call") {
       REQUIRE(res);
 
       THEN("it's possible to receive and restore the message") {
-
         auto request = server->await(await_time);
         REQUIRE(request);
         REQUIRE(request.value());

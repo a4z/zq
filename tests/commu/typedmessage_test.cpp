@@ -6,18 +6,20 @@
 #include "pingpong.pb.h"
 
 SCENARIO("Testing an empty typed message") {
-
   GIVEN("an empty message") {
     zq::TypedMessage m;
     WHEN("checking the type size") {
-      THEN("the size of the type is 0") { REQUIRE_EQ(m.type.size(), 0); }
-      THEN("the size of data is 0") { REQUIRE_EQ(m.payload.size(), 0); }
+      THEN("the size of the type is 0") {
+        REQUIRE_EQ(m.type.size(), 0);
+      }
+      THEN("the size of data is 0") {
+        REQUIRE_EQ(m.payload.size(), 0);
+      }
     }
   }
 }
 
 SCENARIO("Testing an string based typed message") {
-
   GIVEN("a string") {
     std::string str = "hello";
     WHEN("creating a typed message") {
@@ -36,7 +38,6 @@ SCENARIO("Testing an string based typed message") {
 }
 
 SCENARIO("Testing int based typed message") {
-
   GIVEN("some int16_t") {
     int16_t num = 42;
     WHEN("creating a typed message") {
@@ -55,7 +56,6 @@ SCENARIO("Testing int based typed message") {
 }
 
 SCENARIO("Testing double based typed message") {
-
   GIVEN("some double") {
     double num = 42.2;
     WHEN("creating a typed message") {
@@ -74,7 +74,6 @@ SCENARIO("Testing double based typed message") {
 }
 
 SCENARIO("Testing a protobuf based typed message") {
-
   GIVEN("some Protobuf") {
     zq::proto::Ping ping;
     ping.set_id(23);

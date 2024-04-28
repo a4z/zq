@@ -2,6 +2,6 @@
 
 #include "context.hpp"
 
-#include "socket.hpp"
 #include "message.hpp"
+#include "socket.hpp"
 #include "zflags.hpp"

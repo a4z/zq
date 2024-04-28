@@ -1,18 +1,15 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
 // #include <zq/typename.hpp>
-#include "pingpong.pb.h"
 #include <chrono>
 #include <thread>
+#include "pingpong.pb.h"
 
 SCENARIO("Make a hello world request reply") {
-
   GIVEN("a zq context that ") {
-
     auto context = zq::mk_context();
 
     WHEN("running the tests") {
-
       auto push =
           context->connect(zq::SocketType::PUSH, "tcp://localhost:5555");
       auto pull = context->bind(zq::SocketType::PULL, "tcp://*:5555");

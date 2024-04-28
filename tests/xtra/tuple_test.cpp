@@ -1,25 +1,24 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
 // #include <zq/typename.hpp>
-#include "pingpong.pb.h"
 #include <chrono>
 #include <thread>
 #include <tuple>
+#include "pingpong.pb.h"
 
 namespace {
-// startup times on Windows are a problem, they take too long,
-// this can cause test timeout
-using namespace std::chrono_literals;
-auto await_time = 1000ms;
-// auto await_time = std::chrono::milliseconds(1000);
-} // namespace
+  // startup times on Windows are a problem, they take too long,
+  // this can cause test timeout
+  using namespace std::chrono_literals;
+  auto await_time = 1000ms;
+  // auto await_time = std::chrono::milliseconds(1000);
+}  // namespace
 
 // TUPLES NOT SUPORTED YET
 //  because 'std::is_trivially_copyable_v<std::tuple<int, float, int> >'
 //  evaluated to false
 
 SCENARIO("Send a struct") {
-
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
@@ -36,7 +35,6 @@ SCENARIO("Send a struct") {
     REQUIRE(pull);
 
     WHEN("pushing a tuple") {
-
       using mt = std::tuple<int, float, int>;
       auto t1 = std::make_tuple(1, 2.0f, 3);
 
@@ -45,7 +43,7 @@ SCENARIO("Send a struct") {
       auto res = push->send(tm);
       REQUIRE(res);
 
-      THEN("it's possible to receive and restore the tuple") { // not yet
+      THEN("it's possible to receive and restore the tuple") {  // not yet
         auto reply = pull->await(await_time);
         REQUIRE(reply);
         auto restored = zq::restore_as<mt>(*reply.value());

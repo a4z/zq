@@ -80,10 +80,9 @@ target_link_libraries(zq
 )
 
 
-file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h)
+file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp include/*.h)
 add_custom_target(
     clangformat
-    COMMAND clang-format
-    -i
-    ${ALL_SOURCE_FILES}
+    COMMAND git ls-files | grep -E ".*\\.(c|h|cpp|hpp)$" | xargs clang-format -i
+    VERBATIM
 )

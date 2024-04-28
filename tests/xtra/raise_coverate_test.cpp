@@ -2,7 +2,6 @@
 #include <zq/zq.hpp>
 
 SCENARIO("Closing a socket multiple times") {
-
   auto context = zq::mk_context();
 
   GIVEN("a zq socket") {

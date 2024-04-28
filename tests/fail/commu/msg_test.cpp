@@ -6,7 +6,6 @@
 #include <zq/msg.hpp>
 
 SCENARIO("Testing an empty message") {
-
   GIVEN("a default constructed Msg") {
     zq::Msg m;
     WHEN("checking the message type") {
@@ -18,12 +17,13 @@ SCENARIO("Testing an empty message") {
 }
 
 SCENARIO("Testing a Msg with a string") {
-
   GIVEN("a message with a std::string") {
     std::string str = "Hello World";
     auto m = zq::mk_msg(str);
     WHEN("checking the message we got") {
-      THEN("the message is not empty") { REQUIRE(m); }
+      THEN("the message is not empty") {
+        REQUIRE(m);
+      }
       AND_THEN("the message has type MsgType::Variant") {
         REQUIRE(m->type() == zq::MsgType::Variant);
       }
@@ -36,10 +36,11 @@ SCENARIO("Testing a Msg with a string") {
   }
 
   GIVEN("a message with a char array") {
-
     auto m = zq::mk_msg("Hello World");
     WHEN("checking the message we got") {
-      THEN("the message is not empty") { REQUIRE(m); }
+      THEN("the message is not empty") {
+        REQUIRE(m);
+      }
       AND_THEN("the message has type MsgType::Variant") {
         REQUIRE(m->type() == zq::MsgType::Variant);
       }
@@ -48,11 +49,12 @@ SCENARIO("Testing a Msg with a string") {
 }
 
 SCENARIO("Testing a Msg with an int") {
-
   GIVEN("a message with an int") {
     auto m = zq::mk_msg(24);
     WHEN("checking the message we got") {
-      THEN("the message is not empty") { REQUIRE(m); }
+      THEN("the message is not empty") {
+        REQUIRE(m);
+      }
       AND_THEN("the message has type MsgType::Variant") {
         REQUIRE(m->type() == zq::MsgType::Variant);
       }

@@ -9,12 +9,11 @@
 // TODO, move this somewhere else
 // if I would always run ctest, it would not be reuired, but so, it is..
 struct TimeOutInsurance {
-
   using milliseconds = std::chrono::milliseconds;
 
   // no copy operations
-  TimeOutInsurance(const TimeOutInsurance &) = delete;
-  TimeOutInsurance &operator=(const TimeOutInsurance &) = delete;
+  TimeOutInsurance(const TimeOutInsurance&) = delete;
+  TimeOutInsurance& operator=(const TimeOutInsurance&) = delete;
 
   TimeOutInsurance(milliseconds timeout)
       : t([this, timeout] {
@@ -39,14 +38,14 @@ struct TimeOutInsurance {
     }
   }
 
-private:
+ private:
   std::atomic_bool done{false};
   std::thread t;
 };
 
 SCENARIO("Working without zmq background thread") {
   // NOTE: this is only possible with inproc sockets !!
-  const char *inproc_adr = "inproc://#1";
+  const char* inproc_adr = "inproc://#1";
 
   auto Options = {
       zq::ContextOption{.name = zq::CtxOptionName::IO_THREADS, .value = 0},
@@ -90,7 +89,9 @@ SCENARIO("Working without zmq background thread") {
       if (puller.joinable()) {
         puller.join();
       }
-      THEN("the message eventually arrives") { REQUIRE(received); }
+      THEN("the message eventually arrives") {
+        REQUIRE(received);
+      }
     }
   }
 }

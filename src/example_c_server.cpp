@@ -11,7 +11,7 @@
 
 int main(void) {
   //  Socket to talk to clients
-  void *context = zmq_ctx_new();
+  void* context = zmq_ctx_new();
 
   // create zmq message with hello world
   zmq_msg_t msg;
@@ -25,13 +25,12 @@ int main(void) {
   zmq_msg_close(&msg);
   zmq_msg_close(&msg2);
 
-  void *responder = zmq_socket(context, ZMQ_REP);
+  void* responder = zmq_socket(context, ZMQ_REP);
   int rc = zmq_bind(responder, "tcp://*:5555");
   assert(rc == 0);
   printf("start loop\n");
   int i = 0;
   while (i++ < 3) {
-
     char buffer[10];
     zmq_recv(responder, buffer, 10, 0);
     printf("Received Hello\n");

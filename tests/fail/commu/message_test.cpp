@@ -4,7 +4,6 @@
 #include "pingpong.pb.h"
 
 SCENARIO("Testing the message class") {
-
   GIVEN("some string") {
     std::string str = "Hello World";
     WHEN("we create a message from the string") {
@@ -25,7 +24,9 @@ SCENARIO("Testing the message class") {
     }
     AND_WHEN("converting to a different sized type") {
       auto expected = msg_to<int64_t>(zq::Message{data});
-      THEN("We have an exception") { CHECK_FALSE(expected); }
+      THEN("We have an exception") {
+        CHECK_FALSE(expected);
+      }
     }
   }
 
@@ -45,7 +46,9 @@ SCENARIO("Testing the message class") {
     // That's not idiot proof, might be the ping message has the same size ...
     AND_WHEN("converting to a different type") {
       auto expected = msg_to<int64_t>(zq::Message{ping});
-      THEN("We have an exception") { CHECK_FALSE(expected); }
+      THEN("We have an exception") {
+        CHECK_FALSE(expected);
+      }
     }
   }
 }

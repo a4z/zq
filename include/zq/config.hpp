@@ -1,8 +1,7 @@
 #pragma once
 
-
-#include <zmq.h>
 #include <fmt/format.h>
+#include <zmq.h>
 #include <tl/expected.hpp>
 
 #ifdef NDEBUG

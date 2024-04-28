@@ -4,13 +4,10 @@
 #include "pingpong.pb.h"
 
 SCENARIO("Using protobuf") {
-
   GIVEN("a ping message") {
-
     zq::proto::Ping ping;
 
     WHEN("setting properties") {
-
       ping.set_id(1);
       ping.set_msg("hello");
 

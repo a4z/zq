@@ -21,10 +21,7 @@ namespace zq {
     BLOCKY = ZMQ_BLOCKY
   };
 
-
-
-  enum class SocketType : int
-  {
+  enum class SocketType : int {
     REQ = ZMQ_REQ,
     REP = ZMQ_REP,
     DEALER = ZMQ_DEALER,
@@ -38,7 +35,6 @@ namespace zq {
     PAIR = ZMQ_PAIR,
     STREAM = ZMQ_STREAM
   };
-
 
   enum class SocketOptionName : int {
     AFFINITY = ZMQ_AFFINITY,
@@ -85,8 +81,5 @@ namespace zq {
     PROBE_ROUTER = ZMQ_PROBE_ROUTER
   };
 
-  enum class SendFlags : int {
-    NONE = 0,
-    SNDMORE = ZMQ_SNDMORE
-  };
-}
+  enum class SendFlags : int { NONE = 0, SNDMORE = ZMQ_SNDMORE };
+}  // namespace zq

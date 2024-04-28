@@ -4,22 +4,20 @@
 #include <thread>
 
 namespace {
-// startup times on Windows are a problem, they take too long,
-// this can cause test timeout
-using namespace std::chrono_literals;
-auto await_time = 1000ms;
-// auto await_time = std::chrono::milliseconds(1000);
-} // namespace
+  // startup times on Windows are a problem, they take too long,
+  // this can cause test timeout
+  using namespace std::chrono_literals;
+  auto await_time = 1000ms;
+  // auto await_time = std::chrono::milliseconds(1000);
+}  // namespace
 
 // since this might be a useful scenario the api should support it
 
 SCENARIO("Basic publish and scubscribe") {
-
   auto context = zq::mk_context();
   auto endpoint = "ipc://test_pubsub1.ipc";
 
   GIVEN("publish and subscribe socket") {
-
     auto publisher = context->bind(zq::SocketType::PUB, endpoint);
     auto string_subscriber = context->connect(zq::SocketType::SUB, endpoint);
     REQUIRE(publisher);
@@ -49,12 +47,10 @@ SCENARIO("Basic publish and scubscribe") {
 }
 
 SCENARIO("Publish and subscribe with filter") {
-
   auto context = zq::mk_context();
   auto endpoint = "ipc://test_pubsub1.ipc";
 
   GIVEN("publish and subscribe socket") {
-
     auto publisher = context->bind(zq::SocketType::PUB, endpoint);
     REQUIRE(publisher);
     auto string_subscriber = context->connect(zq::SocketType::SUB, endpoint);
@@ -62,8 +58,9 @@ SCENARIO("Publish and subscribe with filter") {
     auto int_subscriber = context->connect(zq::SocketType::SUB, endpoint);
     REQUIRE(int_subscriber);
 
-    WHEN("subscribing the listener, and pushing A int and string typed "
-         "message") {
+    WHEN(
+        "subscribing the listener, and pushing A int and string typed "
+        "message") {
       using namespace std::chrono_literals;
       // it takes time ...
       REQUIRE(zq::subscribe(*string_subscriber, {zq::str_type_name}));

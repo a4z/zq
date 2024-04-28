@@ -1,17 +1,17 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
 // #include <zq/typename.hpp>
-#include "pingpong.pb.h"
 #include <chrono>
 #include <thread>
+#include "pingpong.pb.h"
 
 namespace {
-// startup times on Windows are a problem, they take too long,
-// this can cause test timeout
-using namespace std::chrono_literals;
-auto await_time = 1000ms;
-// auto await_time = std::chrono::milliseconds(1000);
-} // namespace
+  // startup times on Windows are a problem, they take too long,
+  // this can cause test timeout
+  using namespace std::chrono_literals;
+  auto await_time = 1000ms;
+  // auto await_time = std::chrono::milliseconds(1000);
+}  // namespace
 
 struct MyStruct {
   int i{0};
@@ -23,7 +23,6 @@ struct OtherStruct {
 };
 
 SCENARIO("Send a struct") {
-
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
@@ -40,7 +39,6 @@ SCENARIO("Send a struct") {
     REQUIRE(pull);
 
     WHEN("pushing a struct") {
-
       MyStruct s = {42, 3.14f};
       auto tm = zq::typed_message(s);
       // MESSAGE("sending: " << as_string(tm.type)); -> MESSAGE: sending:
