@@ -15,7 +15,7 @@
     {
       "inherits": "base",
       "name": "ninja",
-      "displayName": "Ninja",
+      "displayName": "Ninja (multi-config)",
       "description": "Default Ninja Multi-Config",
       "generator": "Ninja Multi-Config"
     },
@@ -29,7 +29,7 @@
     {
       "inherits": "base",
       "name": "xcode",
-      "displayName": "VisualStudio",
+      "displayName": "XCode",
       "description": "Config for Xcode",
       "generator": "Xcode"
     },
