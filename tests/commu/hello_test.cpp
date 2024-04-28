@@ -1,29 +1,30 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
-//#include <zq/typename.hpp>
+// #include <zq/typename.hpp>
 #include "pingpong.pb.h"
-#include <thread>
 #include <chrono>
 #include <fmt/format.h>
+#include <thread>
 
 namespace {
-      // startup times on Windows are a problem, they take too long,
-      // this can cause test timeout
-  using namespace std::chrono_literals;
-  auto await_time = 1000ms;
-  //auto await_time = std::chrono::milliseconds(1000);
-}
-
+// startup times on Windows are a problem, they take too long,
+// this can cause test timeout
+using namespace std::chrono_literals;
+auto await_time = 1000ms;
+// auto await_time = std::chrono::milliseconds(1000);
+} // namespace
 
 SCENARIO("Make a hello world send receive call") {
 
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
-    // auto push = context->connect(zq::SocketType::PUSH, "tcp://localhost:5555");
-    // auto pull = context->bind(zq::SocketType::PULL, "tcp://localhost:5555");
+    // auto push = context->connect(zq::SocketType::PUSH,
+    // "tcp://localhost:5555"); auto pull = context->bind(zq::SocketType::PULL,
+    // "tcp://localhost:5555");
 
-    auto push = context->connect(zq::SocketType::PUSH, "ipc://push_pull_test_1");
+    auto push =
+        context->connect(zq::SocketType::PUSH, "ipc://push_pull_test_1");
     auto pull = context->bind(zq::SocketType::PULL, "ipc://push_pull_test_1");
 
     REQUIRE(push);
@@ -38,7 +39,6 @@ SCENARIO("Make a hello world send receive call") {
       REQUIRE_EQ(type_name, wanted);
       auto res = push->send(tm);
       REQUIRE(res);
-
 
       THEN("it's possible to receive and restore the message") {
         // don't do this, use await instead, it allows doing lang breaks
@@ -59,7 +59,8 @@ SCENARIO("Make a hello world send receive call") {
         }
         REQUIRE_EQ(received_string, "Hello world");
       }
-      // NOTE: for testing purpose, always await should be used, to not pointless sleep for no reason
+      // NOTE: for testing purpose, always await should be used, to not
+      // pointless sleep for no reason
       AND_THEN("it's also possible to await a message for some time") {
         auto reply = pull->await(await_time);
         REQUIRE(reply);
@@ -80,14 +81,14 @@ SCENARIO("Make a hello world send receive call") {
   }
 }
 
-
 SCENARIO("Make a hello world send receive call") {
 
   auto context = zq::mk_context();
 
   GIVEN("a request and a reply socket with proto messages") {
-    // auto client = context->connect(zq::SocketType::REQ, "tcp://localhost:5555");
-    // auto server = context->bind(zq::SocketType::REP, "tcp://localhost:5555");
+    // auto client = context->connect(zq::SocketType::REQ,
+    // "tcp://localhost:5555"); auto server = context->bind(zq::SocketType::REP,
+    // "tcp://localhost:5555");
     auto client = context->connect(zq::SocketType::REQ, "ipc://localhost_5555");
     auto server = context->bind(zq::SocketType::REP, "ipc://localhost_5555");
     REQUIRE(client);
@@ -96,7 +97,8 @@ SCENARIO("Make a hello world send receive call") {
     WHEN("requesting a ping reply") {
       zq::proto::Ping ping;
       ping.set_id(1);
-      ping.set_msg("Hi");;
+      ping.set_msg("Hi");
+      ;
       auto tm = zq::typed_message("Hello world");
       auto res = client->send(zq::typed_message(ping));
       REQUIRE(res);
@@ -108,7 +110,7 @@ SCENARIO("Make a hello world send receive call") {
         REQUIRE(request.value());
         auto restored = zq::restore_as<zq::proto::Ping>(*request.value());
         if (!restored) {
-          MESSAGE ("error: ", restored.error().what());
+          MESSAGE("error: ", restored.error().what());
         }
         REQUIRE(restored);
         REQUIRE_EQ(restored->id(), 1);
@@ -131,24 +133,23 @@ SCENARIO("Make a hello world send receive call") {
   }
 }
 
-SCENARIO("Trying to create a socket without valid context returns error message")
-{
-	GIVEN("The invalid ZMQ context")
-	{
-		auto maybe_context = zq::mk_context();
+SCENARIO(
+    "Trying to create a socket without valid context returns error message") {
+  GIVEN("The invalid ZMQ context") {
+    auto maybe_context = zq::mk_context();
 
-		REQUIRE( maybe_context.has_value() );
-		REQUIRE( maybe_context->close() == zq::NoError );
+    REQUIRE(maybe_context.has_value());
+    REQUIRE(maybe_context->close() == zq::NoError);
 
-		WHEN("Trying to create a (Request) socket")
-		{
-			auto maybe_socket{ maybe_context->connect(zq::SocketType::REQ, "ipc://localhost_5555") };
+    WHEN("Trying to create a (Request) socket") {
+      auto maybe_socket{
+          maybe_context->connect(zq::SocketType::REQ, "ipc://localhost_5555")};
 
-			THEN("The error message is returned")
-			{
-				REQUIRE_FALSE( maybe_socket.has_value() );
-				REQUIRE( doctest::Contains{"Bad address"}.checkWith( fmt::format("{}", maybe_socket.error()).c_str() ) );
-			}
-		}
-	}
+      THEN("The error message is returned") {
+        REQUIRE_FALSE(maybe_socket.has_value());
+        REQUIRE(doctest::Contains{"Bad address"}.checkWith(
+            fmt::format("{}", maybe_socket.error()).c_str()));
+      }
+    }
+  }
 }

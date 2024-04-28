@@ -4,13 +4,12 @@
 #include <thread>
 
 namespace {
-      // startup times on Windows are a problem, they take too long,
-      // this can cause test timeout
-  using namespace std::chrono_literals;
-  auto await_time = 1000ms;
-  //auto await_time = std::chrono::milliseconds(1000);
-}
-
+// startup times on Windows are a problem, they take too long,
+// this can cause test timeout
+using namespace std::chrono_literals;
+auto await_time = 1000ms;
+// auto await_time = std::chrono::milliseconds(1000);
+} // namespace
 
 // since this might be a useful scenario the api should support it
 
@@ -30,7 +29,8 @@ SCENARIO("Basic publish and scubscribe") {
       using namespace std::chrono_literals;
       auto rc = zq::subscribe(*string_subscriber, {});
       REQUIRE(rc);
-      // it takes time to submit the filter, todo, is there a way to signal when a filter arrives?
+      // it takes time to submit the filter, todo, is there a way to signal when
+      // a filter arrives?
       std::this_thread::sleep_for(50ms);
 
       auto tm = zq::typed_message("Hello world");
@@ -48,7 +48,6 @@ SCENARIO("Basic publish and scubscribe") {
   }
 }
 
-
 SCENARIO("Publish and subscribe with filter") {
 
   auto context = zq::mk_context();
@@ -63,7 +62,8 @@ SCENARIO("Publish and subscribe with filter") {
     auto int_subscriber = context->connect(zq::SocketType::SUB, endpoint);
     REQUIRE(int_subscriber);
 
-    WHEN("subscribing the listener, and pushing A int and string typed message") {
+    WHEN("subscribing the listener, and pushing A int and string typed "
+         "message") {
       using namespace std::chrono_literals;
       // it takes time ...
       REQUIRE(zq::subscribe(*string_subscriber, {zq::str_type_name}));
@@ -78,7 +78,8 @@ SCENARIO("Publish and subscribe with filter") {
         auto int_reply = int_subscriber->await(await_time);
         REQUIRE(string_reply);
         REQUIRE(string_reply.value());
-        auto restored_string = zq::restore_as<std::string>(*string_reply.value());
+        auto restored_string =
+            zq::restore_as<std::string>(*string_reply.value());
         REQUIRE_EQ(restored_string, "Hello world");
 
         REQUIRE(int_reply);
@@ -87,8 +88,8 @@ SCENARIO("Publish and subscribe with filter") {
         REQUIRE_EQ(restored_int, 42);
 
         AND_THEN("all messages have been received") {
-            REQUIRE_FALSE(string_subscriber->await(await_time));
-            REQUIRE_FALSE(int_subscriber->await(await_time));
+          REQUIRE_FALSE(string_subscriber->await(await_time));
+          REQUIRE_FALSE(int_subscriber->await(await_time));
         }
       }
     }

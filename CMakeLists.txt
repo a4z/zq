@@ -80,4 +80,10 @@ target_link_libraries(zq
 )
 
 
-
+file(GLOB_RECURSE ALL_SOURCE_FILES *.cpp *.h)
+add_custom_target(
+    clangformat
+    COMMAND clang-format
+    -i
+    ${ALL_SOURCE_FILES}
+)

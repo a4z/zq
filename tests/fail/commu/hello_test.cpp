@@ -1,12 +1,9 @@
 #include <doctest/doctest.h>
 #include <zq/zq.hpp>
-//#include <zq/typename.hpp>
+// #include <zq/typename.hpp>
 #include "pingpong.pb.h"
-#include <thread>
 #include <chrono>
-
-
-
+#include <thread>
 
 SCENARIO("Make a hello world request reply") {
 
@@ -16,18 +13,19 @@ SCENARIO("Make a hello world request reply") {
 
     WHEN("running the tests") {
 
-      auto push = context->connect(zq::SocketType::PUSH, "tcp://localhost:5555");
+      auto push =
+          context->connect(zq::SocketType::PUSH, "tcp://localhost:5555");
       auto pull = context->bind(zq::SocketType::PULL, "tcp://*:5555");
       THEN("we should see the tests pass") {
         REQUIRE(push);
         REQUIRE(pull);
-        //auto res = push->send(std::string_view("Hello world"));
+        // auto res = push->send(std::string_view("Hello world"));
         auto res = push->send("Hello world");
         REQUIRE(res);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        //CHECK(*res == 11);
+        // CHECK(*res == 11);
         auto reply = pull->recv();
         REQUIRE(reply);
 
