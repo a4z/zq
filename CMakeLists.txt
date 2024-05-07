@@ -16,22 +16,20 @@ endif()
 
 set(CMAKE_CXX_STANDARD 20)
 
-include(FetchContent)
+# Prepare for consumption of astr via vcpkg
+option(FETCH_ASTR "Use fetch content to get a4z::astr" ON)
+if (FETCH_ASTR)
+    message(STATUS "Fetching ASTR")
+    include(FetchContent)
+    FetchContent_Declare(
+    astr
+    GIT_REPOSITORY https://github.com/a4z/astr.git
+    GIT_TAG        main
+    OVERRIDE_FIND_PACKAGE
+    )
+endif()
 
-FetchContent_Declare(
-  astr
-  GIT_REPOSITORY https://github.com/a4z/astr.git
-  GIT_TAG        main
-)
-
-FetchContent_MakeAvailable(astr)
-
-
-
-message(STATUS "*********Toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
-message(STATUS "*********CMAKE_CXX_COMPILER file: ${CMAKE_CXX_COMPILER}")
-
-
+find_package(astr CONFIG REQUIRED)
 find_package(doctest CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
