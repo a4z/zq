@@ -2,20 +2,20 @@ include_guard(GLOBAL)
 
 option(COVERAGE "Enable coverage reporting" OFF)
 
-add_library(_DefaultCoverage INTERFACE)
+add_library(_zq_DefaultCoverage INTERFACE)
 
 if (COVERAGE)
 
     message("Enable code coverage")
 
-    target_compile_options(_DefaultCoverage
+    target_compile_options(_zq_DefaultCoverage
         INTERFACE
         $<$<CXX_COMPILER_ID:GNU>: --coverage>
 
         $<$<CXX_COMPILER_ID:AppleClang>: --coverage>
     )
 
-    target_link_options(_DefaultCoverage
+    target_link_options(_zq_DefaultCoverage
         INTERFACE
         $<$<CXX_COMPILER_ID:GNU>: --coverage>
 
@@ -45,4 +45,4 @@ if (COVERAGE)
 
 endif(COVERAGE)
 
-add_library(default::coverage ALIAS _DefaultCoverage)
+add_library(zq_default::coverage ALIAS _zq_DefaultCoverage)

@@ -64,7 +64,7 @@ add_subdirectory(proto)
 
 target_link_libraries(zq
     INTERFACE
-      default::flags
+      zq_default::flags
       zqproto
       libzmq
       tl::expected

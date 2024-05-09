@@ -7,7 +7,7 @@ function(bin_from_file fname outname)
     set(${outname} ${bname} PARENT_SCOPE)
     add_executable(${bname} ${fname})
     target_link_libraries (${bname}
-        PRIVATE default::flags
+        PRIVATE zq_default::flags
     )
 endfunction(bin_from_file)
 

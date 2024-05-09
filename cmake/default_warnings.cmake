@@ -1,8 +1,8 @@
 include_guard(GLOBAL)
 
 
-add_library(_DefaultWarnings INTERFACE)
-target_compile_options(_DefaultWarnings
+add_library(_zq_DefaultWarnings INTERFACE)
+target_compile_options(_zq_DefaultWarnings
   INTERFACE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>>:
       -Wall -Wextra -pedantic
@@ -49,11 +49,11 @@ target_compile_options(_DefaultWarnings
 # option(WARN_ERROR "Thread warnings as errors" OFF)
 
 # if(WARN_ERROR)
-#   target_compile_options(_DefaultWarnings
+#   target_compile_options(_zq_DefaultWarnings
 #     INTERFACE
 #       $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>>:-Werror>
 #       $<$<CXX_COMPILER_ID:MSVC>:/WX>
 #   )
 # endif(WARN_ERROR)
 
-add_library(default::warnings ALIAS _DefaultWarnings)
+add_library(zq_default::warnings ALIAS _zq_DefaultWarnings)
