@@ -50,8 +50,6 @@ endif()
 
 add_subdirectory(src)
 
-
-
 add_library(zq INTERFACE)
 target_sources(zq INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zq.hpp
@@ -70,7 +68,6 @@ target_link_libraries(zq
       zqproto
       libzmq
       tl::expected
-      strong_type::strong_type
       fmt::fmt # until apple clang catches up
       protobuf::libprotobuf
       a4z::astr
@@ -82,5 +79,6 @@ file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp include/*.h)
 add_custom_target(
     clangformat
     COMMAND git ls-files | grep -E ".*\\.(c|h|cpp|hpp)$" | xargs clang-format -i
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     VERBATIM
 )
