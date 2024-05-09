@@ -34,7 +34,7 @@ function (add_doctest NAME)
     #     )
     # endif()
 
-    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq)
+    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq zqproto zq_default::flags)
 
     if(NOT D_TEST_TIMEOUT)
         set(D_TEST_TIMEOUT 3)

@@ -51,8 +51,15 @@ endif()
 add_subdirectory(src)
 
 add_library(zq INTERFACE)
+add_library(a4z::zq ALIAS zq)
 target_sources(zq INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zq.hpp
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/config.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/context.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/error.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/message.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/socket.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zflags.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zq.hpp>
 )
 target_include_directories(zq INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -64,15 +71,13 @@ add_subdirectory(proto)
 
 target_link_libraries(zq
     INTERFACE
-      zq_default::flags
-      zqproto
       libzmq
-      tl::expected
+      tl::expected # until C++23
       fmt::fmt # until apple clang catches up
       protobuf::libprotobuf
       a4z::astr
-
 )
+
 
 
 file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp include/*.h)
