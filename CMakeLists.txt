@@ -33,7 +33,6 @@ find_package(astr CONFIG REQUIRED)
 find_package(doctest CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
-find_package(strong_type CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED) # until apple clang catches up
 find_package(Protobuf CONFIG REQUIRED)
 
