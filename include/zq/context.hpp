@@ -56,8 +56,8 @@ namespace zq {
         return tl::make_unexpected(currentErrMsg());
       }
       const int err_code = con == SocketCon::BIND
-                         ? zmq_bind(z_socket, endpoint.data())
-                         : zmq_connect(z_socket, endpoint.data());
+                               ? zmq_bind(z_socket, endpoint.data())
+                               : zmq_connect(z_socket, endpoint.data());
       if (err_code != 0) {
         return tl::make_unexpected(currentErrMsg());
       }
