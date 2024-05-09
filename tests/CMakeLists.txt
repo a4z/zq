@@ -14,6 +14,12 @@ add_doctest(test-commu
     SOURCES
        commu/typedmessage_test.cpp
        commu/hello_test.cpp
+    TIMEOUT 10
+)
+
+# keep that extra sice it takes sometiles so long in CI
+add_doctest(test-pubsub
+    SOURCES
        commu/pub_sub_test.cpp
     TIMEOUT 10
 )

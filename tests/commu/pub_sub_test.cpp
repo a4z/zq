@@ -85,8 +85,8 @@ SCENARIO("Publish and subscribe with filter") {
         REQUIRE_EQ(restored_int, 42);
 
         AND_THEN("all messages have been received") {
-          REQUIRE_FALSE(string_subscriber->await(await_time));
-          REQUIRE_FALSE(int_subscriber->await(await_time));
+          REQUIRE_FALSE(string_subscriber->await(100ms));
+          REQUIRE_FALSE(int_subscriber->await(100ms));
         }
       }
     }
