@@ -1,15 +1,12 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(zq CXX)
+project(zq VERSION 0.1.0
+        LANGUAGES CXX
+        DESCRIPTION "A specialised and opioionated C++ wrapper around ZeroMQ")
 
 if(PROJECT_IS_TOP_LEVEL)
     # make git ignore the build directory
     file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-
-    # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
-    # set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
-    # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
-
     set(DO_TEST_PROJECT ON)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 endif()
@@ -27,6 +24,9 @@ if (FETCH_ASTR)
     GIT_TAG        main
     OVERRIDE_FIND_PACKAGE
     )
+    set(astrEXPORT "astr") # not optimal, but for now
+    # basicallly it should be so, if I fetch something,
+    # the make install stuff should not be part of the game ....
 endif()
 
 find_package(astr CONFIG REQUIRED)
@@ -78,6 +78,30 @@ target_link_libraries(zq
       a4z::astr
 )
 
+include(GNUInstallDirs)
+install(TARGETS zq ${astrEXPORT} EXPORT zqTargets INCLUDES DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT zqTargets
+    FILE zqTargets.cmake
+    NAMESPACE a4z::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/zqConfigVersion.cmake
+    COMPATIBILITY AnyNewerVersion
+)
+configure_package_config_file(
+    ${CMAKE_CURRENT_LIST_DIR}/cmake/zqConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/zqConfig.cmake
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/zqConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/zqConfigVersion.cmake
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+)
 
 
 file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp include/*.h)
