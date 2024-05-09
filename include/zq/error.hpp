@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 #include "config.hpp"
+#include <ostream>
 
 namespace zq {
   // TODO, if this is the only one that brings in strong_type, review the
