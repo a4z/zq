@@ -7,6 +7,8 @@ include_guard(GLOBAL)
 # TODO , find that file, in test and tests
 # add_library(doctest_main OBJECT ${PROJECT_SOURCE_DIR}/tests/test_main.cpp)
 
+find_package(doctest CONFIG REQUIRED)
+
 add_library(doctest_main STATIC ${PROJECT_SOURCE_DIR}/tests/test_main.cpp)
 
 set(TEST_FRAMEWORK doctest::doctest)
