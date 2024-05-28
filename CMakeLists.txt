@@ -9,6 +9,12 @@ if(PROJECT_IS_TOP_LEVEL)
     file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
     set(DO_TEST_PROJECT ON)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    add_custom_target(
+        clangformat
+        COMMAND git ls-files | grep -E ".*\\.(c|h|cpp|hpp)$" | xargs clang-format -i
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        VERBATIM
+    )
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -102,10 +108,3 @@ install(
 )
 
 
-file(GLOB_RECURSE ALL_SOURCE_FILES src/*.cpp include/*.h)
-add_custom_target(
-    clangformat
-    COMMAND git ls-files | grep -E ".*\\.(c|h|cpp|hpp)$" | xargs clang-format -i
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    VERBATIM
-)
