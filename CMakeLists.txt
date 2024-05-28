@@ -7,7 +7,7 @@ project(zq VERSION 0.1.0
 if(PROJECT_IS_TOP_LEVEL)
     # make git ignore the build directory
     file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-    set(DO_TEST_PROJECT ON)
+    set(ZQ_TEST_PROJECT ON)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     add_custom_target(
         clangformat
@@ -45,7 +45,7 @@ list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(setup_compiler)
 include(default_flags)
 
-option (BUILD_TESTING "Build the testing tree." ${DO_TEST_PROJECT})
+option (BUILD_TESTING "Build the testing tree." ${ZQ_TEST_PROJECT})
 enable_testing()
 if (BUILD_TESTING)
     include(testing)
