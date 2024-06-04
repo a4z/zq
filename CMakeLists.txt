@@ -7,7 +7,7 @@ project(zq VERSION 0.1.0
 if(PROJECT_IS_TOP_LEVEL)
     # make git ignore the build directory
     file(WRITE ${CMAKE_BINARY_DIR}/.gitignore "*")
-    set(ZQ_TEST_PROJECT ON) # give option to test even if we are not the top project
+    option(ZQ_TEST_PROJECT "Enable testing" ON) # give option to test even if we are not the top project
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     add_custom_target(
         clangformat

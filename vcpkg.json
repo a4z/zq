@@ -6,7 +6,7 @@
     "protobuf",
     {
       "name": "zeromq",
-      "features": [ "sodium", "websockets" ]
+      "features": [ "websockets" ]
     }
   ]
 }

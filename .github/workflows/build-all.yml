@@ -35,7 +35,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
+          sudo apt-get install -y cmake ninja-build libtool autoconf automake lcov
 
       - name: Install dependencies on Mac
         if: matrix.os == 'macos-latest'
