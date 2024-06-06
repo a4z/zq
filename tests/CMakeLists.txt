@@ -17,6 +17,14 @@ add_doctest(test-commu
     TIMEOUT 10
 )
 
+if (ZQ_WITH_PROTO)
+    target_sources(test-commu PRIVATE
+        commu/typedmessage_proto_test.cpp
+        commu/hello_proto_test.cpp
+    )
+endif()
+
+
 # keep that extra sice it takes sometiles so long in CI
 add_doctest(test-pubsub
     SOURCES
@@ -24,10 +32,12 @@ add_doctest(test-pubsub
     TIMEOUT 10
 )
 
-add_doctest(test-proto
-    SOURCES
-      proto/base.cpp
-)
+if (ZQ_WITH_PROTO)
+    add_doctest(test-proto
+        SOURCES
+        proto/base.cpp
+    )
+endif()
 
 add_doctest(test-ctx0
     SOURCES
