@@ -19,10 +19,10 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
+            vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: ninja
           - os: macos-latest
-            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
+            vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: ninja
 
     steps:
