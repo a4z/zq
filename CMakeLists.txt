@@ -41,7 +41,7 @@ find_package(astr CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED) # until apple clang catches up
-find_package(Protobuf CONFIG REQUIRED)
+
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(setup_compiler)
@@ -74,6 +74,7 @@ target_include_directories(zq INTERFACE
 
 
 if (ZQ_WITH_PROTO)
+    find_package(Protobuf CONFIG REQUIRED)
     target_compile_definitions(zq INTERFACE "ZQ_PROTO")
     add_subdirectory(proto)
 endif()
