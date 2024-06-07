@@ -22,6 +22,11 @@ jobs:
             vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: msvc22
             extra_args: -D ZQ_WITH_PROTO=OFF
+            # there was this odd error that could not be reproduced locally on Windos 10 or 11
+            #  -> Running cpp protocol buffer compiler on D:/a/zq/zq/proto/pingpong.proto
+            # The system cannot find the batch label specified - VCEnd
+            # error MSB8066
+            # need to look into it extra ,but for now, disable proto on Windows
           - os: ubuntu-latest
             vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: ninja
@@ -48,12 +53,12 @@ jobs:
           cmakeVersion: "~3.28.0"  # <--= optional, use most recent 3.25.x version
           ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
 
-      # - name: Dump the content of $RUNNER_TEMP
-      #   run: find $RUNNER_TEMP
-      #   shell: bash
-      # - name: Dump the content of $RUNNER_WORKSPACE
-      #   run: find $RUNNER_WORKSPACE
-      #   shell: bash
+      # it's not good to not test proto on Windows, but that accelerates the build for Windows
+      - name: Remove protobuf from vcpkg.json on Windows
+        run: |
+          (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
+        shell: pwsh
+        if: matrix.os == 'windows-latest'
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -65,9 +70,6 @@ jobs:
           vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
           # The vcpkg.json file, which will be part of cache key computation.
           vcpkgJsonGlob: 'vcpkg.json'
-
-      # - name: Prints output of run-vcpkg's action
-      #   run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
 
       - name: Configure CMake
         run: |
