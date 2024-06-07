@@ -47,26 +47,26 @@ jobs:
           cmakeVersion: "~3.28.0"  # <--= optional, use most recent 3.25.x version
           ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
 
-      - name: Dump the content of $RUNNER_TEMP
-        run: find $RUNNER_TEMP
-        shell: bash
-      - name: Dump the content of $RUNNER_WORKSPACE
-        run: find $RUNNER_WORKSPACE
-        shell: bash
+      # - name: Dump the content of $RUNNER_TEMP
+      #   run: find $RUNNER_TEMP
+      #   shell: bash
+      # - name: Dump the content of $RUNNER_WORKSPACE
+      #   run: find $RUNNER_WORKSPACE
+      #   shell: bash
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        id: runvcpkg
-        with:
-          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
-          # The vcpkg.json file, which will be part of cache key computation.
-          vcpkgJsonGlob: 'vcpkg.json'
+      # - name: Setup vcpkg
+      #   uses: lukka/run-vcpkg@v11
+      #   id: runvcpkg
+      #   with:
+      #     # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
+      #     vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+      #     # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
+      #     vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
+      #     # The vcpkg.json file, which will be part of cache key computation.
+      #     vcpkgJsonGlob: 'vcpkg.json'
 
-      - name: Prints output of run-vcpkg's action
-        run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
+      # - name: Prints output of run-vcpkg's action
+      #   run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
 
       - name: Configure CMake
         run: |
