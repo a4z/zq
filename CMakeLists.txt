@@ -93,8 +93,6 @@ if (ZQ_WITH_PROTO)
     )
 endif()
 
-
-
 include(GNUInstallDirs)
 install(TARGETS zq ${astrEXPORT} EXPORT zqTargets INCLUDES DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

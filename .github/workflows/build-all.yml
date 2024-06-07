@@ -31,15 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set VCPKG_ROOT
-        shell: bash
-        run: echo "VCPKG_ROOT=${VCPKG_INSTALLATION_ROOT}" >> $GITHUB_ENV
-        if: runner.os != 'Windows'
-      - name: Set VCPKG_ROOT (Windows)
-        shell: pwsh
-        run: echo "VCPKG_ROOT=$(echo $env:VCPKG_INSTALLATION_ROOT)" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_ENV
-        if: runner.os == 'Windows'
-
       - name: Install dependencies on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -63,16 +54,16 @@ jobs:
       #   run: find $RUNNER_WORKSPACE
       #   shell: bash
 
-      # - name: Setup vcpkg
-      #   uses: lukka/run-vcpkg@v11
-      #   id: runvcpkg
-      #   with:
-      #     # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
-      #     vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-      #     # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-      #     vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
-      #     # The vcpkg.json file, which will be part of cache key computation.
-      #     vcpkgJsonGlob: 'vcpkg.json'
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+        with:
+          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
+          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
+          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
+          # The vcpkg.json file, which will be part of cache key computation.
+          vcpkgJsonGlob: 'vcpkg.json'
 
       # - name: Prints output of run-vcpkg's action
       #   run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
