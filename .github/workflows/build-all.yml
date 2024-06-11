@@ -13,7 +13,7 @@ env:
   VCPKG_COMMIT_ID: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
 
 jobs:
-  job:
+  build_and_test:
     name: ${{ matrix.os }}-${{ github.workflow }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -22,19 +22,16 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            vcpkgCommitId: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
             cmake_preset: msvc22
-            extra_args: -D ZQ_WITH_PROTO=ON
+            extra_args: -D ZQ_WITH_PROTO=OFF
             # there was this odd error that could not be reproduced locally on Windos 10 or 11
             #  -> Running cpp protocol buffer compiler on D:/a/zq/zq/proto/pingpong.proto
             # The system cannot find the batch label specified - VCEnd
             # error MSB8066
             # need to look into it extra ,but for now, disable proto on Windows
           - os: ubuntu-latest
-            vcpkgCommitId: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
             cmake_preset: ninja
           - os: macos-latest
-            vcpkgCommitId: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
             cmake_preset: xcode
 
     steps:
@@ -57,27 +54,23 @@ jobs:
           ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
 
       # it's not good to not test proto on Windows, but that accelerates the build for Windows
-      # - name: Remove protobuf from vcpkg.json on Windows
-      #   run: |
-      #     (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
-      #   shell: pwsh
-      #   if: matrix.os == 'windows-latest'
+      - name: Remove protobuf from vcpkg.json on Windows
+        run: |
+          (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
+        shell: pwsh
+        if: matrix.os == 'windows-latest'
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         id: runvcpkg
         with:
-          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
           vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
           vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
-          # The vcpkg.json file, which will be part of cache key computation.
           vcpkgJsonGlob: 'vcpkg.json'
 
       - name: Configure CMake
         run: |
-          cmake --preset ${{ matrix.cmake_preset }}
-#          cmake --preset ${{ matrix.cmake_preset }} ${{ matrix.extra_args }}
+          cmake --preset ${{ matrix.cmake_preset }} ${{ matrix.extra_args }}
 
       - name: Build
         run: |

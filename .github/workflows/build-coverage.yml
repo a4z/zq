@@ -9,8 +9,11 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  VCPKG_COMMIT_ID: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
+
 jobs:
-  job:
+  coverage:
     name: ${{ matrix.os }}-${{ github.workflow }}-converage
     runs-on: ${{ matrix.os }}
     strategy:
@@ -19,10 +22,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: ninja
           - os: macos-latest
-            vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: ninja
 
     steps:
@@ -55,11 +56,8 @@ jobs:
         uses: lukka/run-vcpkg@v11
         id: runvcpkg
         with:
-          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
           vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
-          # The vcpkg.json file, which will be part of cache key computation.
+          vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
           vcpkgJsonGlob: 'vcpkg.json'
 
       - name: Prints output of run-vcpkg's action
