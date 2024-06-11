@@ -79,3 +79,9 @@ jobs:
       - name: Test
         run: |
           ctest --preset ${{ matrix.cmake_preset }} --output-on-failure
+
+
+  coverage:
+    uses: ./.github/workflows/build-coverage.yml
+
+
