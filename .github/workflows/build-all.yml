@@ -21,7 +21,7 @@ jobs:
           - os: windows-latest
             vcpkgCommitId: '6e31ee33cc9fc93599c4ceb38e229098cf339bb7'
             cmake_preset: msvc22
-            extra_args: -D ZQ_WITH_PROTO=OFF
+            extra_args: -D ZQ_WITH_PROTO=ON
             # there was this odd error that could not be reproduced locally on Windos 10 or 11
             #  -> Running cpp protocol buffer compiler on D:/a/zq/zq/proto/pingpong.proto
             # The system cannot find the batch label specified - VCEnd
@@ -41,7 +41,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake libtool autoconf automake lcov
+          sudo apt-get install -y libtool autoconf automake lcov
 
       - name: Install dependencies on Mac
         if: matrix.os == 'macos-latest'
@@ -54,11 +54,11 @@ jobs:
           ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
 
       # it's not good to not test proto on Windows, but that accelerates the build for Windows
-      - name: Remove protobuf from vcpkg.json on Windows
-        run: |
-          (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
-        shell: pwsh
-        if: matrix.os == 'windows-latest'
+      # - name: Remove protobuf from vcpkg.json on Windows
+      #   run: |
+      #     (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
+      #   shell: pwsh
+      #   if: matrix.os == 'windows-latest'
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
@@ -73,7 +73,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake --preset ${{ matrix.cmake_preset }}  ${{ matrix.extra_args }}
+          cmake --preset ${{ matrix.cmake_preset }}
+#          cmake --preset ${{ matrix.cmake_preset }} ${{ matrix.extra_args }}
 
       - name: Build
         run: |
