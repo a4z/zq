@@ -6,5 +6,6 @@ include(CMakeFindDependencyMacro)
 find_dependency(astr)
 find_dependency(Protobuf)
 find_dependency(tl-expected)
+find_dependency(ZeroMQ)
 
 check_required_components("zq")
