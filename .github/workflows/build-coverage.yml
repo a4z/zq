@@ -1,16 +1,22 @@
 name: CMake Build Coverage
 
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+#   workflow_dispatch:
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_call:
+
+env:
+  VCPKG_COMMIT_ID: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
 
 jobs:
-  job:
+  coverage:
     name: ${{ matrix.os }}-${{ github.workflow }}-converage
     runs-on: ${{ matrix.os }}
     strategy:
@@ -19,27 +25,29 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
-            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: ninja
           - os: macos-latest
-            vcpkgCommitId: '5fa0f075ea51f305b627ecd5e050a363707353ff'
             cmake_preset: ninja
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies on Ubuntu
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build lcov
+          sudo apt-get install -y cmake lcov
 
       - name: Install dependencies on Mac
         if: matrix.os == 'macos-latest'
         run: |
-          brew install ninja lcov autoconf automake libtool
+          brew install lcov autoconf automake libtool
 
       - uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3.28.0"  # <--= optional, use most recent 3.25.x version
+          ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
+
       - name: Dump the content of $RUNNER_TEMP
         run: find $RUNNER_TEMP
         shell: bash
@@ -48,14 +56,11 @@ jobs:
         shell: bash
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@main
+        uses: lukka/run-vcpkg@v11
         id: runvcpkg
         with:
-          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
           vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-          vcpkgGitCommitId: '${{ matrix.vcpkgCommitId}}'
-          # The vcpkg.json file, which will be part of cache key computation.
+          vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
           vcpkgJsonGlob: 'vcpkg.json'
 
       - name: Prints output of run-vcpkg's action

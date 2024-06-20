@@ -30,13 +30,10 @@ function (add_doctest NAME)
     add_executable(${NAME} ${D_TEST_SOURCES})
     target_link_libraries(${NAME} doctest_main)
 
-    # if(EXISTS ${PROJECT_SOURCE_DIR}/include)
-    #     target_include_directories(${NAME} BEFORE PRIVATE
-    #         ${PROJECT_SOURCE_DIR}/include
-    #     )
-    # endif()
-
-    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq zqproto zq_default::flags)
+    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq zq_default::flags)
+    if (ZQ_WITH_PROTO)
+        target_link_libraries(${NAME} zqproto)
+    endif()
 
     if(NOT D_TEST_TIMEOUT)
         set(D_TEST_TIMEOUT 3)

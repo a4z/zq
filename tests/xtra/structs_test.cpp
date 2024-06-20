@@ -3,7 +3,6 @@
 // #include <zq/typename.hpp>
 #include <chrono>
 #include <thread>
-#include "pingpong.pb.h"
 
 namespace {
   // startup times on Windows are a problem, they take too long,
