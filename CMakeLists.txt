@@ -17,6 +17,8 @@ if(PROJECT_IS_TOP_LEVEL)
     )
 endif()
 
+option(ZQ_WITH_PROTO "Build with protobuf tests" ON)
+
 set(CMAKE_CXX_STANDARD 20)
 
 # Prepare for consumption of astr via vcpkg
@@ -39,7 +41,7 @@ find_package(astr CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED) # until apple clang catches up
-find_package(Protobuf CONFIG REQUIRED)
+
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(setup_compiler)
@@ -60,6 +62,7 @@ target_sources(zq INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/context.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/error.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/message.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/message_proto.hpp> # doesnt matter to have the header if it's not used
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/socket.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zflags.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/zq.hpp>
@@ -69,17 +72,27 @@ target_include_directories(zq INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 
-add_subdirectory(proto)
 
+if (ZQ_WITH_PROTO)
+    find_package(Protobuf CONFIG REQUIRED)
+    target_compile_definitions(zq INTERFACE "ZQ_PROTO")
+    add_subdirectory(proto)
+endif()
 
 target_link_libraries(zq
     INTERFACE
       libzmq
       tl::expected # until C++23
       fmt::fmt # until apple clang catches up
-      protobuf::libprotobuf
       a4z::astr
 )
+
+if (ZQ_WITH_PROTO)
+    target_link_libraries(zq
+        INTERFACE
+        protobuf::libprotobuf
+    )
+endif()
 
 include(GNUInstallDirs)
 install(TARGETS zq ${astrEXPORT} EXPORT zqTargets INCLUDES DESTINATION "${CMAKE_INSTALL_LIBDIR}")

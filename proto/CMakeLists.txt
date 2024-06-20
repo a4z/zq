@@ -1,7 +1,6 @@
 # Get the filenames of all the proto files.
 file(GLOB PROTO_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.proto)
 
-
 add_library(zqproto STATIC)
 
 MESSAGE(STATUS "Found protoc: ${Protobuf_PROTOC_EXECUTABLE}")
