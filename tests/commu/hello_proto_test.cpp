@@ -1,8 +1,7 @@
 #include <doctest/doctest.h>
-#include <zq/zq.hpp>
-#include <fmt/format.h>
 #include <chrono>
 #include <thread>
+#include <zq/zq.hpp>
 #include "pingpong.pb.h"
 
 namespace {
@@ -12,7 +11,6 @@ namespace {
   auto await_time = 1000ms;
   // auto await_time = std::chrono::milliseconds(1000);
 }  // namespace
-
 
 SCENARIO("Make a hello world send receive call with proto messages") {
   auto context = zq::mk_context();

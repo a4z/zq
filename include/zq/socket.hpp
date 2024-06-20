@@ -46,20 +46,42 @@ namespace zq {
       return NoError;
     }
 
-    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const TypedMessage& msg) {
+    template <pack_of_messages... Messages>
+    [[nodiscard]] tl::expected<size_t, ErrMsg> sendMsg(
+        [[maybe_unused]] const Message& first,
+        const Messages&... messages) {
       size_t bytes_sent = 0;
-      auto rc = zmq_send(socket_ptr.get(), msg.type.data(), msg.type.size(),
-                         ZMQ_SNDMORE);
-      if (rc < 0) {
-        return tl::make_unexpected(currentErrMsg());
+
+      if constexpr (sizeof...(messages) == 0) {
+        auto rc = zmq_send(socket_ptr.get(), first.data(), first.size(),
+                           ZMQ_DONTWAIT);
+        if (rc < 0) {
+          return tl::make_unexpected(currentErrMsg());
+        }
+        bytes_sent += static_cast<size_t>(rc);
+      } else {
+        auto rc =
+            zmq_send(socket_ptr.get(), first.data(), first.size(), ZMQ_SNDMORE);
+        if (rc < 0) {
+          return tl::make_unexpected(currentErrMsg());
+        }
+        auto maybe_rc = sendMsg(messages...);
+        if (!maybe_rc) {
+          return maybe_rc;
+        }
+        bytes_sent += static_cast<size_t>(rc) + maybe_rc.value();
       }
-      bytes_sent += static_cast<size_t>(rc);
-      rc = zmq_send(socket_ptr.get(), msg.payload.data(), msg.payload.size(),
-                    ZMQ_DONTWAIT);
-      if (rc < 0) {
-        return tl::make_unexpected(currentErrMsg());
-      }
-      return bytes_sent + static_cast<size_t>(rc);
+      return bytes_sent;
+    }
+
+    /**
+     * @brief Send a typed message
+     *
+     * @param msg
+     * @return tl::expected<size_t, ErrMsg>
+     */
+    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const TypedMessage& msg) {
+      return sendMsg(msg.type, msg.payload);
     }
 
     // either error, no message available, or message

@@ -3,7 +3,6 @@
 #include <zq/zq.hpp>
 #include "pingpong.pb.h"
 
-
 SCENARIO("Testing a protobuf based typed message") {
   GIVEN("some Protobuf") {
     zq::proto::Ping ping;

@@ -21,22 +21,6 @@ option(ZQ_WITH_PROTO "Build with protobuf tests" ON)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# Prepare for consumption of astr via vcpkg
-option(FETCH_ASTR "Use fetch content to get a4z::astr" ON)
-if (FETCH_ASTR)
-    message(STATUS "Fetching ASTR")
-    include(FetchContent)
-    FetchContent_Declare(
-    astr
-    GIT_REPOSITORY https://github.com/a4z/astr.git
-    GIT_TAG        main
-    OVERRIDE_FIND_PACKAGE
-    )
-    set(astrEXPORT "astr") # not optimal, but for now
-    # basicallly it should be so, if I fetch something,
-    # the make install stuff should not be part of the game ....
-endif()
-
 find_package(astr CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)

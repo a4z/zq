@@ -48,5 +48,4 @@ namespace zq {
     return value;
   }
 
-
 }  // namespace zq
