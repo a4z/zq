@@ -76,6 +76,7 @@ target_include_directories(zq INTERFACE
 if (ZQ_WITH_PROTO)
     find_package(Protobuf CONFIG REQUIRED)
     target_compile_definitions(zq INTERFACE "ZQ_PROTO")
+    set(Protobuf_DEPENDENCY "find_dependency(Protobuf)")
     add_subdirectory(proto)
 endif()
 

@@ -4,7 +4,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/zqTargets.cmake")
 
 include(CMakeFindDependencyMacro)
 find_dependency(astr)
-find_dependency(Protobuf)
+@Protobuf_DEPENDENCY@
 find_dependency(tl-expected)
 find_dependency(ZeroMQ)
 
