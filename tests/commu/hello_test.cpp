@@ -1,8 +1,7 @@
 #include <doctest/doctest.h>
-#include <zq/zq.hpp>
-#include <fmt/format.h>
 #include <chrono>
 #include <thread>
+#include <zq/zq.hpp>
 
 namespace {
   // startup times on Windows are a problem, they take too long,
@@ -78,7 +77,6 @@ SCENARIO("Make a hello world send receive call") {
   }
 }
 
-
 SCENARIO("Make a hello world send receive call") {
   auto context = zq::mk_context();
 
@@ -92,7 +90,6 @@ SCENARIO("Make a hello world send receive call") {
     REQUIRE(server);
 
     WHEN("requesting a ping reply") {
-
       std::string hello_str = "Hello world";
       auto tm = zq::typed_message(hello_str);
       auto res = client->send(tm);
@@ -124,7 +121,6 @@ SCENARIO("Make a hello world send receive call") {
     }
   }
 }
-
 
 SCENARIO(
     "Trying to create a socket without valid context returns error message") {

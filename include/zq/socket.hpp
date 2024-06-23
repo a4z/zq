@@ -46,29 +46,53 @@ namespace zq {
       return NoError;
     }
 
-    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const TypedMessage& msg) {
+    template <pack_of_messages... Messages>
+    [[nodiscard]] tl::expected<size_t, ErrMsg> send(
+        const Message& first,
+        const Messages&... messages) {
       size_t bytes_sent = 0;
-      auto rc = zmq_send(socket_ptr.get(), msg.type.data(), msg.type.size(),
-                         ZMQ_SNDMORE);
-      if (rc < 0) {
-        return tl::make_unexpected(currentErrMsg());
+
+      if constexpr (sizeof...(messages) == 0) {
+        auto rc = zmq_send(socket_ptr.get(), first.data(), first.size(),
+                           ZMQ_DONTWAIT);
+        if (rc < 0) {
+          return tl::make_unexpected(currentErrMsg());
+        }
+        bytes_sent += static_cast<size_t>(rc);
+      } else {
+        auto rc =
+            zmq_send(socket_ptr.get(), first.data(), first.size(), ZMQ_SNDMORE);
+        if (rc < 0) {
+          return tl::make_unexpected(currentErrMsg());
+        }
+        auto maybe_rc = send(messages...);
+        if (!maybe_rc) {
+          return maybe_rc;
+        }
+        bytes_sent += static_cast<size_t>(rc) + maybe_rc.value();
       }
-      bytes_sent += static_cast<size_t>(rc);
-      rc = zmq_send(socket_ptr.get(), msg.payload.data(), msg.payload.size(),
-                    ZMQ_DONTWAIT);
-      if (rc < 0) {
-        return tl::make_unexpected(currentErrMsg());
-      }
-      return bytes_sent + static_cast<size_t>(rc);
+      return bytes_sent;
     }
 
-    // either error, no message available, or message
-    // that's hard to model, but maybe that works
-    // but it might be annoying to check every non receive for an error
-    // so still an optional ?
-    [[nodiscard]]
-    // tl::expected<TypedMessage, std::optional<std::runtime_error>>
-    std::optional<tl::expected<TypedMessage, std::runtime_error>>
+    /**
+     * @brief Send a typed message
+     *
+     * @param msg
+     * @return tl::expected<size_t, ErrMsg>
+     */
+    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const TypedMessage& msg) {
+      return send(msg.type, msg.payload);
+    }
+
+    /**
+     * @brief Return a typed message
+     *
+     *  Returns nothing if there is a zmq error
+     *  Returns an error if it does not look like a typed message
+     *
+     * @return std::optional<tl::expected<TypedMessage, std::runtime_error>>
+     */
+    [[nodiscard]] std::optional<tl::expected<TypedMessage, std::runtime_error>>
     recv() {
       TypedMessage typed_message;
 
@@ -99,6 +123,37 @@ namespace zq {
       }
 
       return typed_message;
+    }
+
+    /**
+     * @brief Receive as many message parts as there are on the socket
+     *
+     * @return std::optional<tl::expected<Message, std::runtime_error>>
+     */
+    [[nodiscard]] std::optional<
+        tl::expected<std::vector<Message>, std::runtime_error>>
+    recv_n() {
+      std::vector<Message> messages;
+      int more = 1;
+      size_t more_size = sizeof(more);
+      while (more) {
+        Message message;
+        auto rc = zmq_msg_recv(std::addressof(message.msg), socket_ptr.get(),
+                               ZMQ_DONTWAIT);
+        messages.emplace_back(std::move(message));
+        if (rc == -1) {
+          if (zmq_errno() == EAGAIN) {
+            return std::nullopt;
+          } else {
+            return tl::make_unexpected(currentZmqRuntimeError());
+          }
+        }
+        rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
+        if (rc == -1) {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+      }
+      return messages;
     }
 
     [[nodiscard]] std::optional<tl::expected<TypedMessage, std::runtime_error>>

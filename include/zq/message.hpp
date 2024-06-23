@@ -100,6 +100,11 @@ namespace zq {
   template <typename T>
   concept mem_copyable_message = mem_copyable<T> && !is_char_array<T>;
 
+  template <typename T>
+  concept is_message = std::is_same_v<T, Message>;
+
+  template <typename... Args>
+  concept pack_of_messages = (is_message<Args> && ...);
 
   // create type name message
   template <typename T>

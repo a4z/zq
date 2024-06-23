@@ -8,6 +8,7 @@ add_doctest(test-base
     SOURCES
       base/err_test.cpp
       base/context_test.cpp
+      base/simple_msg_test.cpp
 )
 
 add_doctest(test-commu
