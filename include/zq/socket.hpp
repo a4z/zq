@@ -48,7 +48,7 @@ namespace zq {
 
     template <pack_of_messages... Messages>
     [[nodiscard]] tl::expected<size_t, ErrMsg> send(
-        [[maybe_unused]] const Message& first,
+        const Message& first,
         const Messages&... messages) {
       size_t bytes_sent = 0;
 
