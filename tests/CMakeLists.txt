@@ -18,6 +18,13 @@ add_doctest(test-commu
     TIMEOUT 10
 )
 
+
+add_doctest(test-xtend
+    SOURCES
+       xtend/rec_v_n_test.cpp
+       xtend/empty_message_test.cpp
+)
+
 if (ZQ_WITH_PROTO)
     target_sources(test-commu PRIVATE
         commu/typedmessage_proto_test.cpp
