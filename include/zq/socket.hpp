@@ -132,7 +132,7 @@ namespace zq {
      */
     [[nodiscard]] std::optional<
         tl::expected<std::vector<Message>, std::runtime_error>>
-    recv_n() {
+    recv_all() {
       std::vector<Message> messages;
       int more = 1;
       size_t more_size = sizeof(more);

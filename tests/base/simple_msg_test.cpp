@@ -31,11 +31,11 @@ SCENARIO("Make a hello world send receive call") {
         REQUIRE_FALSE(*request);
       }
       AND_THEN("it is possible to receive this as an untyped message") {
-        auto maybe_messages = server->recv_n();
+        auto maybe_messages = server->recv_all();
         while (!maybe_messages) {
           using namespace std::chrono_literals;
           std::this_thread::sleep_for(50ms);
-          maybe_messages = server->recv_n();
+          maybe_messages = server->recv_all();
         }
         REQUIRE_EQ(maybe_messages.value()->size(), 1);
         auto& message = maybe_messages.value()->at(0);
@@ -55,11 +55,11 @@ SCENARIO("Make a hello world send receive call") {
       REQUIRE(res);
 
       THEN("the messages are received as a package") {
-        auto maybe_messages = server->recv_n();
+        auto maybe_messages = server->recv_all();
         while (!maybe_messages) {
           using namespace std::chrono_literals;
           std::this_thread::sleep_for(50ms);
-          maybe_messages = server->recv_n();
+          maybe_messages = server->recv_all();
         }
         REQUIRE(*maybe_messages);
         const std::vector<zq::Message>& received_messages =
