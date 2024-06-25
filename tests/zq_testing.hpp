@@ -2,21 +2,20 @@
 
 #include <atomic>
 #include <chrono>
-#include <string>
 #include <cstdlib>
+#include <string>
 #include <thread>
 #include <zq/zq.hpp>
 
-inline
-std::tuple<zq::Socket, zq::Socket> pp_cs_sockets(zq::Context& context,
-  std::string_view address) {
+inline std::tuple<zq::Socket, zq::Socket> pp_cs_sockets(
+    zq::Context& context,
+    std::string_view address) {
   auto server = context.bind(zq::SocketType::REP, address);
   auto client = context.connect(zq::SocketType::REQ, address);
   REQUIRE(client);
   REQUIRE(server);
-  return { std::move(*client), std::move(*server) };
+  return {std::move(*client), std::move(*server)};
 }
-
 
 inline std::atomic<int> atomic_counter{0};
 
@@ -27,7 +26,6 @@ inline std::string next_inproc_address() {
 inline std::string next_ipc_address() {
   return "ipc://zq_testpipe_" + std::to_string(atomic_counter++);
 }
-
 
 // if I would always run ctest, it would not be required
 struct TimeOutInsurance {

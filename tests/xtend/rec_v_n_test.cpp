@@ -19,7 +19,7 @@ enum class RecvResult { Ok, Underflow, Overflow };
 
 template <size_t N>
 struct RecvData {
-  size_t msg_count{ 0 };
+  size_t msg_count{0};
   std::array<zq::Message, N> messages{};
 
   RecvResult result() {
@@ -35,19 +35,18 @@ struct RecvData {
 
 template <size_t N>
 auto recv_n(zq::Socket& socket)
--> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
+    -> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
   RecvData<N> data{};
   auto* socket_ptr = socket.socket_ptr.get();
   using zq::currentZmqRuntimeError;
 
   auto rc = zmq_msg_recv(std::addressof(data.messages[0].msg), socket_ptr,
-    ZMQ_DONTWAIT);
+                         ZMQ_DONTWAIT);
 
   if (rc == -1) {
     if (zmq_errno() == EAGAIN) {
       return std::nullopt;
-    }
-    else {
+    } else {
       return tl::make_unexpected(currentZmqRuntimeError());
     }
   }
@@ -89,12 +88,11 @@ SCENARIO("Testing recv_n") {
   using namespace std::chrono_literals;
 
   GIVEN("a request, a reply socket") {
-
     auto [client, server] = pp_cs_sockets(*context, next_inproc_address());
 
     WHEN("sending 2 messages") {
       auto res =
-        client.send(zq::str_message("Hello"), zq::str_message("world"));
+          client.send(zq::str_message("Hello"), zq::str_message("world"));
       REQUIRE(res);
       THEN("reading N = 2 works fine") {
         auto poll_rc = server.poll(500ms);
@@ -111,7 +109,7 @@ SCENARIO("Testing recv_n") {
 
     WHEN("sending 4 messages") {
       auto res = client.send(zq::str_message("Hello"), zq::str_message("World"),
-        zq::str_message("what's"), zq::str_message("up"));
+                             zq::str_message("what's"), zq::str_message("up"));
       THEN("reading N = 2 produces an overflow") {
         auto poll_rc = server.poll(500ms);
         REQUIRE(poll_rc);

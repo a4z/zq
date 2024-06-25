@@ -23,10 +23,8 @@ SCENARIO("Send a struct") {
 
   GIVEN("a push and a pull socket") {
     const auto address = next_ipc_address();
-    auto push =
-        context->connect(zq::SocketType::PUSH, address);
-    auto pull =
-        context->bind(zq::SocketType::PULL, address);
+    auto push = context->connect(zq::SocketType::PUSH, address);
+    auto pull = context->bind(zq::SocketType::PULL, address);
 
     REQUIRE(push);
     REQUIRE(pull);
@@ -36,7 +34,7 @@ SCENARIO("Send a struct") {
       auto t1 = std::make_tuple(1, 2.0f, 3);
 
       auto tm = zq::typed_message(t1);
-      //MESSAGE("sending: " << as_string(tm.type));
+      // MESSAGE("sending: " << as_string(tm.type));
       auto res = push->send(tm);
       REQUIRE(res);
 

@@ -15,11 +15,9 @@ SCENARIO("Make a hello world send receive call") {
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
-
     auto address = next_ipc_address();
     MESSAGE("The number is ", address);
-    auto push =
-        context->connect(zq::SocketType::PUSH, address);
+    auto push = context->connect(zq::SocketType::PUSH, address);
     auto pull = context->bind(zq::SocketType::PULL, address);
 
     REQUIRE(push);

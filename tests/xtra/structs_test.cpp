@@ -26,10 +26,8 @@ SCENARIO("Send a struct") {
 
   GIVEN("a push and a pull socket") {
     const auto address = next_ipc_address();
-    auto push =
-        context->connect(zq::SocketType::PUSH, address);
-    auto pull =
-        context->bind(zq::SocketType::PULL, address);
+    auto push = context->connect(zq::SocketType::PUSH, address);
+    auto pull = context->bind(zq::SocketType::PULL, address);
 
     REQUIRE(push);
     REQUIRE(pull);
