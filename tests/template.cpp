@@ -8,6 +8,8 @@ SCENARIO("We compile and run the tests") {
     WHEN("running the tests") {
       THEN("we should see the tests pass") {
         CHECK(context);
+        auto e = context->close();
+        CHECK(e == zq::NoError);
       }
     }
   }
