@@ -47,6 +47,15 @@ namespace zq {
       CONNECT,
     };
 
+    /**
+     * @brief Internal connector function
+     *  Binds or connects to a given endpoint
+     * @internal
+     * @param con
+     * @param type
+     * @param endpoint
+     * @return tl::expected<Socket, ErrMsg>
+     */
     [[nodiscard]] tl::expected<Socket, ErrMsg> bind_or_connect(
         SocketCon con,
         SocketType type,
@@ -93,6 +102,15 @@ namespace zq {
     Context& operator=(const Context&) = delete;
     Context& operator=(Context&&) = delete;
 
+    /**
+     * @brief Close the context
+     *
+     * Called by the destructor
+     * But since closing might block for a while, depending on options
+     * its sometimes better to call this explicitly
+     *
+     * @return Error code
+     */
     [[nodiscard]] Error close() {
       if (z_ctx != nullptr) {
         if (zmq_ctx_term(z_ctx) != 0) {
@@ -102,14 +120,27 @@ namespace zq {
       return NoError;
     }
 
-    // create socket of given type binds to endpoint
+    /**
+     * @brief Bind a socket to an endpoint
+     *
+     * @param type
+     * @param endpoint
+     * @return tl::expected<Socket, ErrMsg>
+     */
     [[nodiscard]] tl::expected<Socket, ErrMsg> bind(
         SocketType type,
         std::string_view endpoint) noexcept {
       return bind_or_connect(SocketCon::BIND, type, endpoint);
       // validate no publisher ?
     }
-    // create socket of given type connects to endpoint
+
+    /**
+     * @brief Connect a socket to an endpoint
+     *
+     * @param type
+     * @param endpoint
+     * @return tl::expected<Socket, ErrMsg>
+     */
     [[nodiscard]] tl::expected<Socket, ErrMsg> connect(
         SocketType type,
         std::string_view endpoint) noexcept {
@@ -118,6 +149,12 @@ namespace zq {
     }
   };
 
+  /**
+   * @brief Factory function for creating a context
+   *  This version takes a list of options
+   * @param options
+   * @return tl::expected<Context, ErrMsg>
+   */
   [[nodiscard]] auto inline mk_context(
       ContextOptions auto const& options) noexcept
       -> tl::expected<Context, ErrMsg> {
@@ -135,6 +172,11 @@ namespace zq {
     return ctx;
   }
 
+  /**
+   * @brief Factory function for creating a context
+   *  This version uses the default options
+   * @return tl::expected<Context, ErrMsg>
+   */
   [[nodiscard]] auto inline mk_context() noexcept
       -> tl::expected<Context, ErrMsg> {
     return mk_context(DefaultContextOptions);
