@@ -3,16 +3,17 @@
 #include <array>
 #include <chrono>
 #include <thread>
-#include <zq/zq.hpp>
 
-std::tuple<zq::Socket, zq::Socket> pp_cs_sockets(zq::Context& context,
-  std::string_view address) {
-  auto server = context.bind(zq::SocketType::REP, address);
-  auto client = context.connect(zq::SocketType::REQ, address);
-  REQUIRE(client);
-  REQUIRE(server);
-  return { std::move(*client), std::move(*server) };
-}
+#include "../zq_testing.hpp"
+
+// std::tuple<zq::Socket, zq::Socket> pp_cs_sockets(zq::Context& context,
+//   std::string_view address) {
+//   auto server = context.bind(zq::SocketType::REP, address);
+//   auto client = context.connect(zq::SocketType::REQ, address);
+//   REQUIRE(client);
+//   REQUIRE(server);
+//   return { std::move(*client), std::move(*server) };
+// }
 
 enum class RecvResult { Ok, Underflow, Overflow };
 
@@ -88,8 +89,8 @@ SCENARIO("Testing recv_n") {
   using namespace std::chrono_literals;
 
   GIVEN("a request, a reply socket") {
-    std::string_view address = "ipc://localhost_5556";
-    auto [client, server] = pp_cs_sockets(*context, address);
+
+    auto [client, server] = pp_cs_sockets(*context, next_inproc_address());
 
     WHEN("sending 2 messages") {
       auto res =

@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <zq/zq.hpp>
+#include "../zq_testing.hpp"
 // #include <zq/typename.hpp>
 #include <chrono>
 #include <thread>
@@ -22,14 +22,11 @@ SCENARIO("Send a struct") {
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
-    // auto push = context->connect(zq::SocketType::PUSH,
-    // "tcp://localhost:5555"); auto pull = context->bind(zq::SocketType::PULL,
-    // "tcp://localhost:5555");
-
+    const auto address = next_ipc_address();
     auto push =
-        context->connect(zq::SocketType::PUSH, "ipc://push_pull_test_tpl1");
+        context->connect(zq::SocketType::PUSH, address);
     auto pull =
-        context->bind(zq::SocketType::PULL, "ipc://push_pull_test_tpl1");
+        context->bind(zq::SocketType::PULL, address);
 
     REQUIRE(push);
     REQUIRE(pull);
@@ -39,7 +36,7 @@ SCENARIO("Send a struct") {
       auto t1 = std::make_tuple(1, 2.0f, 3);
 
       auto tm = zq::typed_message(t1);
-      MESSAGE("sending: " << as_string(tm.type));
+      //MESSAGE("sending: " << as_string(tm.type));
       auto res = push->send(tm);
       REQUIRE(res);
 

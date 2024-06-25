@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
 #include <chrono>
 #include <thread>
-#include <zq/zq.hpp>
+#include "../zq_testing.hpp"
 
 namespace {
   // startup times on Windows are a problem, they take too long,
@@ -15,13 +15,12 @@ SCENARIO("Make a hello world send receive call") {
   auto context = zq::mk_context();
 
   GIVEN("a push and a pull socket") {
-    // auto push = context->connect(zq::SocketType::PUSH,
-    // "tcp://localhost:5555"); auto pull = context->bind(zq::SocketType::PULL,
-    // "tcp://localhost:5555");
 
+    auto address = next_ipc_address();
+    MESSAGE("The number is ", address);
     auto push =
-        context->connect(zq::SocketType::PUSH, "ipc://push_pull_test_1");
-    auto pull = context->bind(zq::SocketType::PULL, "ipc://push_pull_test_1");
+        context->connect(zq::SocketType::PUSH, address);
+    auto pull = context->bind(zq::SocketType::PULL, address);
 
     REQUIRE(push);
     REQUIRE(pull);
