@@ -6,19 +6,19 @@
 #include <zq/zq.hpp>
 
 std::tuple<zq::Socket, zq::Socket> pp_cs_sockets(zq::Context& context,
-                                                 std::string_view address) {
+  std::string_view address) {
   auto server = context.bind(zq::SocketType::REP, address);
   auto client = context.connect(zq::SocketType::REQ, address);
   REQUIRE(client);
   REQUIRE(server);
-  return {std::move(*client), std::move(*server)};
+  return { std::move(*client), std::move(*server) };
 }
 
 enum class RecvResult { Ok, Underflow, Overflow };
 
 template <size_t N>
 struct RecvData {
-  size_t msg_count{0};
+  size_t msg_count{ 0 };
   std::array<zq::Message, N> messages{};
 
   RecvResult result() {
@@ -34,18 +34,19 @@ struct RecvData {
 
 template <size_t N>
 auto recv_n(zq::Socket& socket)
-    -> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
+-> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
   RecvData<N> data{};
   auto* socket_ptr = socket.socket_ptr.get();
   using zq::currentZmqRuntimeError;
 
   auto rc = zmq_msg_recv(std::addressof(data.messages[0].msg), socket_ptr,
-                         ZMQ_DONTWAIT);
+    ZMQ_DONTWAIT);
 
   if (rc == -1) {
     if (zmq_errno() == EAGAIN) {
       return std::nullopt;
-    } else {
+    }
+    else {
       return tl::make_unexpected(currentZmqRuntimeError());
     }
   }
@@ -84,6 +85,7 @@ auto recv_n(zq::Socket& socket)
 SCENARIO("Testing recv_n") {
   auto context = zq::mk_context();
   REQUIRE(context);
+  using namespace std::chrono_literals;
 
   GIVEN("a request, a reply socket") {
     std::string_view address = "ipc://localhost_5556";
@@ -91,18 +93,13 @@ SCENARIO("Testing recv_n") {
 
     WHEN("sending 2 messages") {
       auto res =
-          client.send(zq::str_message("Hello"), zq::str_message("world"));
+        client.send(zq::str_message("Hello"), zq::str_message("world"));
       REQUIRE(res);
       THEN("reading N = 2 works fine") {
+        auto poll_rc = server.poll(500ms);
+        REQUIRE(poll_rc);
+        REQUIRE_EQ(poll_rc.value(), true);
         auto maybe_data = recv_n<2>(server);
-        int count = 0;
-        while (!maybe_data && count < 10) {
-          using namespace std::chrono_literals;
-          std::this_thread::sleep_for(50ms);
-          maybe_data = recv_n<2>(server);
-          count++;
-        }
-
         REQUIRE(maybe_data);
         REQUIRE(maybe_data.has_value());
         auto& data = maybe_data.value();
@@ -113,18 +110,12 @@ SCENARIO("Testing recv_n") {
 
     WHEN("sending 4 messages") {
       auto res = client.send(zq::str_message("Hello"), zq::str_message("World"),
-                             zq::str_message("what's"), zq::str_message("up"));
+        zq::str_message("what's"), zq::str_message("up"));
       THEN("reading N = 2 produces an overflow") {
+        auto poll_rc = server.poll(500ms);
+        REQUIRE(poll_rc);
+        REQUIRE_EQ(poll_rc.value(), true);
         auto maybe_data = recv_n<2>(server);
-        int count = 0;
-        // this repetition ..., I should all change ot await like apis. TODO
-        while (!maybe_data && count < 10) {
-          using namespace std::chrono_literals;
-          std::this_thread::sleep_for(50ms);
-          maybe_data = recv_n<2>(server);
-          count++;
-        }
-
         REQUIRE(maybe_data);
         REQUIRE(maybe_data.has_value());
         auto& data = maybe_data.value();
@@ -149,16 +140,10 @@ SCENARIO("Testing recv_n") {
     WHEN("sending 1 message") {
       auto res = client.send(zq::str_message("Hello"));
       THEN("reading N = 2 produces an underflow") {
+        auto poll_rc = server.poll(500ms);
+        REQUIRE(poll_rc);
+        REQUIRE_EQ(poll_rc.value(), true);
         auto maybe_data = recv_n<2>(server);
-        int count = 0;
-        // this repetition ..., I should all change ot await like apis. TODO
-        while (!maybe_data && count < 10) {
-          using namespace std::chrono_literals;
-          std::this_thread::sleep_for(50ms);
-          maybe_data = recv_n<2>(server);
-          count++;
-        }
-
         REQUIRE(maybe_data);
         REQUIRE(maybe_data.has_value());
         auto& data = maybe_data.value();
