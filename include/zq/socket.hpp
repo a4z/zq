@@ -5,6 +5,7 @@
 #include "message.hpp"
 #include "zflags.hpp"
 
+#include <array>
 #include <chrono>
 #include <string_view>
 
@@ -17,6 +18,24 @@ namespace zq {
       if (ptr) {
         zmq_close(ptr);
       }
+    }
+  };
+
+  enum class RecvResult { Ok, Underflow, Overflow };
+
+  template <size_t N>
+  struct RecvData {
+    size_t msg_count{0};
+    std::array<zq::Message, N> messages{};
+
+    RecvResult result() {
+      if (msg_count < N) {
+        return RecvResult::Underflow;
+      }
+      if (msg_count > N) {
+        return RecvResult::Overflow;
+      }
+      return RecvResult::Ok;
     }
   };
 
@@ -206,6 +225,64 @@ namespace zq {
         return tl::make_unexpected(currentZmqRuntimeError());
       }
       return rc > 0;
+    }
+
+    /**
+     * @brief Receive multipart message
+     *
+     * todo, overflow underflow description here
+     *
+     * @tparam N
+     * @return std::optional<tl::expected<RecvData<N>, std::runtime_error>>
+     */
+    template <size_t N>
+    auto recv_n()
+        -> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
+      RecvData<N> data{};
+
+      using zq::currentZmqRuntimeError;
+
+      auto rc = zmq_msg_recv(std::addressof(data.messages[0].msg),
+                             socket_ptr.get(), ZMQ_DONTWAIT);
+
+      if (rc == -1) {
+        if (zmq_errno() == EAGAIN) {
+          return std::nullopt;
+        } else {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+      }
+      data.msg_count++;
+
+      int more = 0;
+      size_t more_size = sizeof(more);
+      // read expected num of messages, no more data, return what we have
+      for (size_t i = 1; i < N; ++i) {
+        rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
+        if (rc == -1) {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+        if (!more) {
+          return data;
+        }
+        rc = zmq_msg_recv(std::addressof(data.messages[i].msg),
+                          socket_ptr.get(), 0);
+        if (rc == -1) {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+        data.msg_count++;
+      }
+      // one more 'more' check for the overflow case is required
+      rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
+      if (rc == -1) {
+        return tl::make_unexpected(currentZmqRuntimeError());
+      }
+      if (more) {
+        data.msg_count++;
+        ;
+      }
+
+      return data;
     }
   };
 
