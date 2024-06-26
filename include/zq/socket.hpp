@@ -5,6 +5,7 @@
 #include "message.hpp"
 #include "zflags.hpp"
 
+#include <array>
 #include <chrono>
 #include <string_view>
 
@@ -17,6 +18,24 @@ namespace zq {
       if (ptr) {
         zmq_close(ptr);
       }
+    }
+  };
+
+  enum class RecvResult { Ok, Underflow, Overflow };
+
+  template <size_t N>
+  struct RecvData {
+    size_t msg_count{0};
+    std::array<zq::Message, N> messages{};
+
+    RecvResult result() {
+      if (msg_count < N) {
+        return RecvResult::Underflow;
+      }
+      if (msg_count > N) {
+        return RecvResult::Overflow;
+      }
+      return RecvResult::Ok;
     }
   };
 
@@ -35,6 +54,11 @@ namespace zq {
 
     ~Socket() noexcept { [[maybe_unused]] auto _ = close(); }
 
+    /**
+     * @brief Close the socket
+     *
+     * @return Error code
+     */
     [[nodiscard]] Error close() noexcept {
       if (socket_ptr != nullptr) {
         if (zmq_close(socket_ptr.get()) != 0) {
@@ -46,6 +70,14 @@ namespace zq {
       return NoError;
     }
 
+    /**
+     * @brief Send one or more messages
+     *
+     * @tparam Messages
+     * @param first
+     * @param messages
+     * @return tl::expected<size_t, ErrMsg> Number of bytes sent, or an error
+     */
     template <pack_of_messages... Messages>
     [[nodiscard]] tl::expected<size_t, ErrMsg> send(
         const Message& first,
@@ -156,6 +188,14 @@ namespace zq {
       return messages;
     }
 
+    /**
+     * @brief await a typed message
+     *
+     * This function is going to be replaced
+     *
+     * @param timeout
+     * @return std::optional<tl::expected<TypedMessage, std::runtime_error>>
+     */
     [[nodiscard]] std::optional<tl::expected<TypedMessage, std::runtime_error>>
     await(std::chrono::milliseconds timeout) {
       zmq_pollitem_t poll_item[] = {{socket_ptr.get(), 0, ZMQ_POLLIN, 0}};
@@ -167,8 +207,92 @@ namespace zq {
 
       return recv();
     }
+
+    /**
+     * @brief Poll for given timeout
+     *
+     * Returns true if there is data to receive, false otherwise
+     *
+     * @param timeout
+     * @return tl::expected<bool, std::runtime_error>
+     */
+    [[nodiscard]] tl::expected<bool, std::runtime_error> poll(
+        std::chrono::milliseconds timeout) {
+      zmq_pollitem_t poll_item[] = {{socket_ptr.get(), 0, ZMQ_POLLIN, 0}};
+      long tm = static_cast<long>(timeout.count());
+      auto rc = zmq_poll(poll_item, 1, tm);
+      if (rc == -1) {
+        return tl::make_unexpected(currentZmqRuntimeError());
+      }
+      return rc > 0;
+    }
+
+    /**
+     * @brief Receive multipart message
+     *
+     * todo, overflow underflow description here
+     *
+     * @tparam N
+     * @return std::optional<tl::expected<RecvData<N>, std::runtime_error>>
+     */
+    template <size_t N>
+    auto recv_n()
+        -> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
+      RecvData<N> data{};
+
+      using zq::currentZmqRuntimeError;
+
+      auto rc = zmq_msg_recv(std::addressof(data.messages[0].msg),
+                             socket_ptr.get(), ZMQ_DONTWAIT);
+
+      if (rc == -1) {
+        if (zmq_errno() == EAGAIN) {
+          return std::nullopt;
+        } else {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+      }
+      data.msg_count++;
+
+      int more = 0;
+      size_t more_size = sizeof(more);
+      // read expected num of messages, no more data, return what we have
+      for (size_t i = 1; i < N; ++i) {
+        rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
+        if (rc == -1) {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+        if (!more) {
+          return data;
+        }
+        rc = zmq_msg_recv(std::addressof(data.messages[i].msg),
+                          socket_ptr.get(), 0);
+        if (rc == -1) {
+          return tl::make_unexpected(currentZmqRuntimeError());
+        }
+        data.msg_count++;
+      }
+      // one more 'more' check for the overflow case is required
+      rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
+      if (rc == -1) {
+        return tl::make_unexpected(currentZmqRuntimeError());
+      }
+      if (more) {
+        data.msg_count++;
+        ;
+      }
+
+      return data;
+    }
   };
 
+  /**
+   * @brief Subscribe a subscriber to a list of topics
+   *
+   * @param subscriber
+   * @param topic_filters
+   * @return tl::expected<size_t, std::runtime_error>
+   */
   [[nodiscard]] inline tl::expected<size_t, std::runtime_error> subscribe(
       Socket& subscriber,
       std::initializer_list<std::string_view> topic_filters) {

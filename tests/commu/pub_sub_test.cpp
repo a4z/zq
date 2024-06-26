@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <zq/zq.hpp>
+#include "../zq_testing.hpp"
 
 #include <thread>
 
@@ -15,7 +15,8 @@ namespace {
 
 SCENARIO("Basic publish and scubscribe") {
   auto context = zq::mk_context();
-  auto endpoint = "ipc://test_pubsub1.ipc";
+  auto endpoint = next_ipc_address();
+  ;
 
   GIVEN("publish and subscribe socket") {
     auto publisher = context->bind(zq::SocketType::PUB, endpoint);

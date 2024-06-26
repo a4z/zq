@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
 #include <chrono>
 #include <thread>
-#include <zq/zq.hpp>
+#include "../zq_testing.hpp"
 #include "pingpong.pb.h"
 
 namespace {
@@ -16,11 +16,9 @@ SCENARIO("Make a hello world send receive call with proto messages") {
   auto context = zq::mk_context();
 
   GIVEN("a request and a reply socket with proto messages") {
-    // auto client = context->connect(zq::SocketType::REQ,
-    // "tcp://localhost:5555"); auto server = context->bind(zq::SocketType::REP,
-    // "tcp://localhost:5555");
-    auto client = context->connect(zq::SocketType::REQ, "ipc://localhost_5555");
-    auto server = context->bind(zq::SocketType::REP, "ipc://localhost_5555");
+    auto address = next_ipc_address();
+    auto client = context->connect(zq::SocketType::REQ, address);
+    auto server = context->bind(zq::SocketType::REP, address);
     REQUIRE(client);
     REQUIRE(server);
 

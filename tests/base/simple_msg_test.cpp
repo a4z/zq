@@ -2,13 +2,13 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
-#include <zq/zq.hpp>
+#include "../zq_testing.hpp"
 
 SCENARIO("Make a hello world send receive call") {
   auto context = zq::mk_context();
 
   GIVEN("a request, a reply socket, and an untyped message") {
-    std::string_view address = "ipc://localhost_5556";
+    auto address = next_ipc_address();
 
     auto server = context->bind(zq::SocketType::REP, address);
     auto client = context->connect(zq::SocketType::REQ, address);
