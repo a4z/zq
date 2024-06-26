@@ -111,10 +111,10 @@ SCENARIO("Send a container of messages") {
     }
 
     AND_WHEN("sending an array of messages") {
-      std::array<zq::Message, 4> amsgs = { zq::str_message("Hello"),
+      std::array<zq::Message, 4> amsgs = {{ zq::str_message("Hello"),
                                           zq::str_message("World"),
                                           zq::str_message("What's"),
-                                          zq::str_message("Up") };
+                                          zq::str_message("Up")}};
       auto res = client.send(amsgs);
       REQUIRE(res);
       THEN("reading all data works fine") {

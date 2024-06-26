@@ -1,5 +1,5 @@
-find_program(GCC_PATH gcc-13)
-find_program(GPP_PATH g++-13)
+find_program(GCC_PATH gcc-14)
+find_program(GPP_PATH g++-14)
 
 if(NOT GCC_PATH)
     message(FATAL_ERROR "gcc-13 not found")
