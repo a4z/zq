@@ -23,6 +23,7 @@ add_doctest(test-xtend
     SOURCES
        xtend/rec_v_n_test.cpp
        xtend/empty_message_test.cpp
+       xtend/multipoll_test.cpp
 )
 
 if (ZQ_WITH_PROTO)
