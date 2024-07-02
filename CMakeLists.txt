@@ -28,8 +28,6 @@ find_package(fmt CONFIG REQUIRED) # until apple clang catches up
 
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include(setup_compiler)
-include(default_flags)
 
 if (${ZQ_TEST_PROJECT})
     include(CTest)
