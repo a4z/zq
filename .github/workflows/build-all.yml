@@ -70,6 +70,7 @@ jobs:
 
       - name: Configure CMake
         run: |
+          cmake --version
           cmake --preset ${{ matrix.cmake_preset }} ${{ matrix.extra_args }}
 
       - name: Build

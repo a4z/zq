@@ -43,6 +43,7 @@ target_sources(zq INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/config.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/context.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/error.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/error_fmt.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/message.hpp>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/message_proto.hpp> # doesnt matter to have the header if it's not used
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/zq/socket.hpp>
