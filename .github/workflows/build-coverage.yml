@@ -45,7 +45,7 @@ jobs:
 
       - uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: "~3.28.0"  # <--= optional, use most recent 3.25.x version
+          cmakeVersion: "~3.29.0"  # <--= optional, use most recent 3.25.x version
           ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
 
       - name: Dump the content of $RUNNER_TEMP

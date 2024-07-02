@@ -1,12 +1,10 @@
 #include <doctest/doctest.h>
 
-#include "../zq_testing.hpp"
 #include <chrono>
 #include <functional>
-
+#include "../zq_testing.hpp"
 
 struct Poll {
-
   using SocketRef = std::reference_wrapper<zq::Socket>;
   using Callback = std::function<void(zq::Socket&)>;
   using Actor = std::pair<SocketRef, Callback>;
@@ -31,11 +29,10 @@ struct Poll {
     return retval;
   }
 
-private:
+ private:
   Actors entries;
   std::vector<zmq_pollitem_t> poll_items;
 };
-
 
 SCENARIO("Multi Socket Polling") {
   auto context = zq::mk_context();
@@ -48,37 +45,38 @@ SCENARIO("Multi Socket Polling") {
     auto [client3, server3] = pp_cs_sockets(*context, next_inproc_address());
 
     WHEN("checking the size of the message") {
-
       Poll::Actors actors;
       bool server1_called = false;
       bool server2_called = false;
       bool server3_called = false;
 
       actors.push_back({server1, [&server1_called](zq::Socket& socket) {
-        auto reply = socket.recv();
-        REQUIRE(reply);
-        REQUIRE(reply.value());
-        auto restored = zq::restore_as<std::string>(*reply.value());
-        REQUIRE_EQ(restored, "first");
-        server1_called = true;
-      }});
+                          auto reply = socket.recv();
+                          REQUIRE(reply);
+                          REQUIRE(reply.value());
+                          auto restored =
+                              zq::restore_as<std::string>(*reply.value());
+                          REQUIRE_EQ(restored, "first");
+                          server1_called = true;
+                        }});
       actors.push_back({server2, [&server2_called](zq::Socket& socket) {
-        auto reply = socket.recv();
-        REQUIRE(reply);
-        REQUIRE(reply.value());
-        auto restored = zq::restore_as<std::string>(*reply.value());
-        REQUIRE_EQ(restored, "second");
-        server2_called = true;
-      }});
+                          auto reply = socket.recv();
+                          REQUIRE(reply);
+                          REQUIRE(reply.value());
+                          auto restored =
+                              zq::restore_as<std::string>(*reply.value());
+                          REQUIRE_EQ(restored, "second");
+                          server2_called = true;
+                        }});
       actors.push_back({server3, [&server3_called](zq::Socket& socket) {
-        auto reply = socket.recv();
-        REQUIRE(reply);
-        REQUIRE(reply.value());
-        auto restored = zq::restore_as<std::string>(*reply.value());
-        REQUIRE_EQ(restored, "third");
-        server3_called = true;
-      }});
-
+                          auto reply = socket.recv();
+                          REQUIRE(reply);
+                          REQUIRE(reply.value());
+                          auto restored =
+                              zq::restore_as<std::string>(*reply.value());
+                          REQUIRE_EQ(restored, "third");
+                          server3_called = true;
+                        }});
 
       Poll poll(std::move(actors));
 
@@ -103,7 +101,6 @@ SCENARIO("Multi Socket Polling") {
         REQUIRE(server2_called);
         REQUIRE(server3_called);
       }
-
     }
   }
 }

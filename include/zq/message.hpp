@@ -1,7 +1,7 @@
 #pragma once
 
+#include <iostream>
 #include <limits>
-
 #include "a4z/typename.hpp"
 #include "config.hpp"
 #include "error.hpp"
@@ -39,7 +39,8 @@ namespace zq {
       if (r != 0) {
         if constexpr (debug_build) {
           auto ce = currentErrMsg();
-          fmt::print(stderr, "zmq_msg_close: {}, {}\n", ce.error, ce.message);
+          std::cerr << "zmq_msg_close: " << ce.error << ", " << ce.message
+                    << std::endl;
         }
       }
       zmq_msg_init(std::addressof(msg));
@@ -53,7 +54,8 @@ namespace zq {
       if (r != 0) {
         if constexpr (debug_build) {
           auto ce = currentErrMsg();
-          fmt::print(stderr, "zmq_msg_close: {}, {}\n", ce.error, ce.message);
+          std::cerr << "zmq_msg_close: " << ce.error << ", " << ce.message
+                    << std::endl;
         }
       }
     }
