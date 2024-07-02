@@ -50,8 +50,8 @@ jobs:
 
       - uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: "~3.28.0"  # <--= optional, use most recent 3.25.x version
-          ninjaVersion: "^1.12.0"  # <--= optional, use most recent 1.x version
+          cmakeVersion: "~3.29.0"
+          ninjaVersion: "^1.12.0"
 
       # it's not good to not test proto on Windows, but that accelerates the build for Windows
       - name: Remove protobuf from vcpkg.json on Windows
