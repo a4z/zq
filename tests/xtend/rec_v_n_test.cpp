@@ -16,7 +16,7 @@ SCENARIO("Testing recv_n") {
 
     WHEN("sending 2 messages") {
       auto res =
-        client.send(zq::str_message("Hello"), zq::str_message("world"));
+          client.send(zq::str_message("Hello"), zq::str_message("world"));
       REQUIRE(res);
       THEN("reading N = 2 works fine") {
         auto poll_rc = server.poll(500ms);
@@ -33,7 +33,7 @@ SCENARIO("Testing recv_n") {
 
     WHEN("sending 4 messages") {
       auto res = client.send(zq::str_message("Hello"), zq::str_message("World"),
-        zq::str_message("what's"), zq::str_message("up"));
+                             zq::str_message("what's"), zq::str_message("up"));
       THEN("reading N = 2 produces an overflow") {
         auto poll_rc = server.poll(500ms);
         REQUIRE(poll_rc);
@@ -77,7 +77,6 @@ SCENARIO("Testing recv_n") {
   }
 }
 
-
 SCENARIO("Send a container of messages") {
   auto context = zq::mk_context();
   REQUIRE(context);
@@ -111,10 +110,9 @@ SCENARIO("Send a container of messages") {
     }
 
     AND_WHEN("sending an array of messages") {
-      std::array<zq::Message, 4> amsgs = {{ zq::str_message("Hello"),
-                                          zq::str_message("World"),
-                                          zq::str_message("What's"),
-                                          zq::str_message("Up")}};
+      std::array<zq::Message, 4> amsgs = {
+          {zq::str_message("Hello"), zq::str_message("World"),
+           zq::str_message("What's"), zq::str_message("Up")}};
       auto res = client.send(amsgs);
       REQUIRE(res);
       THEN("reading all data works fine") {
@@ -132,6 +130,5 @@ SCENARIO("Send a container of messages") {
         REQUIRE_EQ(msg3, "Up");
       }
     }
-
   }
 }
