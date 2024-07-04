@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fmt/core.h>
+#include <string>
 #include <ostream>
 #include "config.hpp"
 

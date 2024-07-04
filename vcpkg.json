@@ -3,7 +3,6 @@
     "astr",
     "doctest",
     "tl-expected",
-    "fmt",
     "protobuf",
     {
       "name": "zeromq",
