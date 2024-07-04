@@ -7,6 +7,7 @@
 
 #include <array>
 #include <chrono>
+#include <memory>
 #include <string_view>
 
 namespace zq {
