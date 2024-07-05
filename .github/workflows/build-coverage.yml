@@ -68,7 +68,8 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake --preset ${{ matrix.cmake_preset }} -DCOVERAGE=ON
+          vcpkg add port protobuf
+          cmake --preset ${{ matrix.cmake_preset }} -DCOVERAGE=ON -DZQ_WITH_PROTO=ON
 
       - name: Build
         run: |
