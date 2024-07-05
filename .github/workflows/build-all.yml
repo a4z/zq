@@ -23,7 +23,7 @@ jobs:
         include:
           - os: windows-latest
             cmake_preset: msvc22
-            extra_args: -D ZQ_WITH_PROTO=OFF
+            # extra_args: -D ZQ_WITH_PROTO=OFF
             # there was this odd error that could not be reproduced locally on Windos 10 or 11
             #  -> Running cpp protocol buffer compiler on D:/a/zq/zq/proto/pingpong.proto
             # The system cannot find the batch label specified - VCEnd
@@ -54,11 +54,11 @@ jobs:
           ninjaVersion: "^1.12.0"
 
       # it's not good to not test proto on Windows, but that accelerates the build for Windows
-      - name: Remove protobuf from vcpkg.json on Windows
-        run: |
-          (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
-        shell: pwsh
-        if: matrix.os == 'windows-latest'
+      # - name: Remove protobuf from vcpkg.json on Windows
+      #   run: |
+      #     (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
+      #   shell: pwsh
+      #   if: matrix.os == 'windows-latest'
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11

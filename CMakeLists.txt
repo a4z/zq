@@ -17,7 +17,7 @@ if(PROJECT_IS_TOP_LEVEL)
     )
 endif()
 
-option(ZQ_WITH_PROTO "Build with protobuf tests" ON)
+option(ZQ_WITH_PROTO "Build with protobuf tests" OFF)
 
 set(CMAKE_CXX_STANDARD 20)
 

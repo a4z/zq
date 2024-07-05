@@ -3,7 +3,6 @@
     "astr",
     "doctest",
     "tl-expected",
-    "protobuf",
     {
       "name": "zeromq",
       "features": [ "websockets" ]
