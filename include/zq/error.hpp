@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fmt/core.h>
+#include <string>
 #include <ostream>
 #include "config.hpp"
 
@@ -61,6 +61,13 @@ namespace zq {
   struct ErrMsg {
     Error error;
     std::string message;
+    std::string as_string() const {
+      std::string msg = std::to_string(error.value()) + ": " + message;
+      return msg;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const ErrMsg& msg) {
+      return os << msg.as_string();
+    }
   };
 
   inline Error currentError() noexcept {
@@ -71,39 +78,10 @@ namespace zq {
     return ErrMsg{currentError(), zmq_strerror(zmq_errno())};
   }
 
-}  // namespace zq
-
-template <>
-struct fmt::formatter<zq::Error> : public fmt::formatter<int> {
-  template <typename FormatContext>
-  constexpr auto format(const zq::Error& e,
-                        FormatContext& ctx) const -> decltype(ctx.out()) {
-    return fmt::formatter<int>::format(e.value(), ctx);
-  }
-};
-
-template <>
-struct fmt::formatter<zq::ErrMsg> {
-  constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-
-  auto format(const zq::ErrMsg& e, fmt::format_context& ctx) {
-    return fmt::format_to(ctx.out(), "{}, {}", e.error, e.message);
-  }
-};
-
-template <>
-struct fmt::formatter<std::runtime_error> {
-  constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-
-  auto format(const std::runtime_error& e, fmt::format_context& ctx) {
-    return fmt::format_to(ctx.out(), "{}", e.what());
-  }
-};
-
-namespace zq {
-
   inline auto currentZmqRuntimeError() noexcept {
-    return std::runtime_error(fmt::format("{}", currentErrMsg()));
+    const auto ce = currentErrMsg();
+    return std::runtime_error(ce.as_string());
   }
 
 }  // namespace zq
+
