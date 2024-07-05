@@ -24,7 +24,6 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(astr CONFIG REQUIRED)
 find_package(ZeroMQ CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
-# find_package(fmt CONFIG REQUIRED) # until apple clang catches up
 
 
 list(PREPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -67,7 +66,6 @@ target_link_libraries(zq
     INTERFACE
       libzmq
       tl::expected # until C++23
-      # fmt::fmt # until apple clang catches up
       a4z::astr
 )
 
