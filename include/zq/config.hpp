@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <zmq.h>
 #include <tl/expected.hpp>
 

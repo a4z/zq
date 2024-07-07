@@ -35,7 +35,7 @@ namespace zq {
 
   class Context {
     // The actual constructor
-    friend tl::expected<Context, ErrMsg> mk_context(
+    friend tl::expected<Context, ZmqError> mk_context(
         ContextOptions auto const& options) noexcept;
 
     void* z_ctx{nullptr};
@@ -54,21 +54,21 @@ namespace zq {
      * @param con
      * @param type
      * @param endpoint
-     * @return tl::expected<Socket, ErrMsg>
+     * @return tl::expected<Socket, ZmqError>
      */
-    [[nodiscard]] tl::expected<Socket, ErrMsg> bind_or_connect(
+    [[nodiscard]] tl::expected<Socket, ZmqError> bind_or_connect(
         SocketCon con,
         SocketType type,
         std::string_view endpoint) noexcept {
       auto z_socket = zmq_socket(z_ctx, static_cast<int>(type));
       if (z_socket == nullptr) {
-        return tl::make_unexpected(currentErrMsg());
+        return tl::make_unexpected(currentZmqError());
       }
       const int err_code = con == SocketCon::BIND
                                ? zmq_bind(z_socket, endpoint.data())
                                : zmq_connect(z_socket, endpoint.data());
       if (err_code != 0) {
-        return tl::make_unexpected(currentErrMsg());
+        return tl::make_unexpected(currentZmqError());
       }
       // ZMQ_LINGER
       {
@@ -80,14 +80,14 @@ namespace zq {
             zmq_setsockopt(z_socket, static_cast<int>(SocketOptionName::LINGER),
                            std::addressof(opt_value), opt_len);
         if (rc != 0) {
-          return tl::make_unexpected(currentErrMsg());
+          return tl::make_unexpected(currentZmqError());
         }
       }
       SocketPointer sp{z_socket};
       /* Explicitly create the expected objects, otherwise, the return value
        optimization will not be invoked and the Socket's move constructor and
        destructor will be called. */
-      return tl::expected<Socket, ErrMsg>{std::move(sp)};
+      return tl::expected<Socket, ZmqError>{std::move(sp)};
     }
 
    public:
@@ -109,12 +109,12 @@ namespace zq {
      * But since closing might block for a while, depending on options
      * its sometimes better to call this explicitly
      *
-     * @return Error code
+     * @return ZmqErrorNo code
      */
-    [[nodiscard]] Error close() {
+    [[nodiscard]] ZmqErrorNo close() {
       if (z_ctx != nullptr) {
         if (zmq_ctx_term(z_ctx) != 0) {
-          return Error{zmq_errno()};
+          return ZmqErrorNo{zmq_errno()};
         }
       }
       return NoError;
@@ -125,9 +125,9 @@ namespace zq {
      *
      * @param type
      * @param endpoint
-     * @return tl::expected<Socket, ErrMsg>
+     * @return tl::expected<Socket, ZmqError>
      */
-    [[nodiscard]] tl::expected<Socket, ErrMsg> bind(
+    [[nodiscard]] tl::expected<Socket, ZmqError> bind(
         SocketType type,
         std::string_view endpoint) noexcept {
       return bind_or_connect(SocketCon::BIND, type, endpoint);
@@ -139,9 +139,9 @@ namespace zq {
      *
      * @param type
      * @param endpoint
-     * @return tl::expected<Socket, ErrMsg>
+     * @return tl::expected<Socket, ZmqError>
      */
-    [[nodiscard]] tl::expected<Socket, ErrMsg> connect(
+    [[nodiscard]] tl::expected<Socket, ZmqError> connect(
         SocketType type,
         std::string_view endpoint) noexcept {
       return bind_or_connect(SocketCon::CONNECT, type, endpoint);
@@ -153,20 +153,20 @@ namespace zq {
    * @brief Factory function for creating a context
    *  This version takes a list of options
    * @param options
-   * @return tl::expected<Context, ErrMsg>
+   * @return tl::expected<Context, ZmqError>
    */
   [[nodiscard]] auto inline mk_context(
       ContextOptions auto const& options) noexcept
-      -> tl::expected<Context, ErrMsg> {
+      -> tl::expected<Context, ZmqError> {
     auto z_ctx = zmq_ctx_new();
     if (z_ctx == nullptr) {
-      return tl::make_unexpected(currentErrMsg());
+      return tl::make_unexpected(currentZmqError());
     }
     Context ctx{z_ctx};
     for (auto const& option : options) {
       if (zmq_ctx_set(z_ctx, static_cast<int>(option.name), option.value) !=
           0) {
-        return tl::make_unexpected(currentErrMsg());
+        return tl::make_unexpected(currentZmqError());
       }
     }
     return ctx;
@@ -175,10 +175,10 @@ namespace zq {
   /**
    * @brief Factory function for creating a context
    *  This version uses the default options
-   * @return tl::expected<Context, ErrMsg>
+   * @return tl::expected<Context, ZmqError>
    */
   [[nodiscard]] auto inline mk_context() noexcept
-      -> tl::expected<Context, ErrMsg> {
+      -> tl::expected<Context, ZmqError> {
     return mk_context(DefaultContextOptions);
   }
 

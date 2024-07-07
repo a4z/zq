@@ -4,9 +4,8 @@
 #include <ostream>
 #include "error.hpp"
 
-
 template <>
-struct fmt::formatter<zq::Error> : public fmt::formatter<int> {
+struct fmt::formatter<zq::ZmqErrorNo> : public fmt::formatter<int> {
   template <typename FormatContext>
   constexpr auto format(const zq::Error& e,
                         FormatContext& ctx) const -> decltype(ctx.out()) {
@@ -15,10 +14,10 @@ struct fmt::formatter<zq::Error> : public fmt::formatter<int> {
 };
 
 template <>
-struct fmt::formatter<zq::ErrMsg> {
+struct fmt::formatter<zq::ZmqError> {
   constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
 
-  auto format(const zq::ErrMsg& e, fmt::format_context& ctx) {
+  auto format(const zq::ZmqError& e, fmt::format_context& ctx) {
     return fmt::format_to(ctx.out(), "{}, {}", e.error, e.message);
   }
 };
@@ -35,7 +34,7 @@ struct fmt::formatter<std::runtime_error> {
 namespace zq {
 
   inline auto currentZmqRuntimeError() noexcept {
-    return std::runtime_error(fmt::format("{}", currentErrMsg()));
+    return std::runtime_error(fmt::format("{}", currentZmqError()));
   }
 
 }  // namespace zq
