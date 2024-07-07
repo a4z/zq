@@ -34,7 +34,7 @@ namespace zq {
     };
 
     auto unexpected = [](std::string_view err_msg) {
-      return tl::make_unexpected(ZqError{err_msg.data()}));
+      return tl::make_unexpected(ZqError{err_msg.data()});
     };
 
     if (!check_type_name()) {
