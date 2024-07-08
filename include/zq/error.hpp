@@ -71,7 +71,8 @@ namespace zq {
    * @brief Class encapsulating a ZeroMQ error.
    *
    * If a ZeroMQ function returns an error,
-   * this class is used to inform the user of zq about the error
+   * this class is used to return the ZeroMQ internal
+   * error number and the error message.
    *
    * Note that zq does not throw exceptions, but returns expected values.
    *
