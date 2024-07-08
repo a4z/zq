@@ -30,11 +30,3 @@ struct fmt::formatter<std::runtime_error> {
     return fmt::format_to(ctx.out(), "{}", e.what());
   }
 };
-
-namespace zq {
-
-  inline auto currentZmqRuntimeError() noexcept {
-    return std::runtime_error(fmt::format("{}", currentZmqError()));
-  }
-
-}  // namespace zq
