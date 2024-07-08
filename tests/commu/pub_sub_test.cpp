@@ -93,3 +93,23 @@ SCENARIO("Publish and subscribe with filter") {
     }
   }
 }
+
+SCENARIO("Wrong subscriber call") {
+  auto context = zq::mk_context();
+  REQUIRE(context);
+
+  GIVEN("a request, a reply socket") {
+    auto [client, server] = pp_cs_sockets(*context, next_inproc_address());
+
+    WHEN("rrying to subscribe the push socket") {
+      auto subscribe_rc = zq::subscribe(client, {"foo", "bar"});
+
+      THEN("an error was is returned") {
+        REQUIRE_FALSE(subscribe_rc);
+        zq::Error err = subscribe_rc.error();
+        const std::string err_msg = err.what();
+        REQUIRE(doctest::Contains{"not a subscr"}.checkWith(err_msg.c_str()));
+      }
+    }
+  }
+}
