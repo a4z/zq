@@ -46,8 +46,10 @@ SCENARIO("Testing int based typed message") {
         REQUIRE_EQ(*restored, num);
       }
       AND_THEN("restoring to an integer is not possible") {
-        auto restored = zq::restore_as<int>(tm);
+        auto restored = zq::restore_as<std::string>(tm);
         REQUIRE_FALSE(restored);
+        auto err = restored.error();
+        REQUIRE_EQ(std::string(err.what()), "Message type does not match");
       }
     }
   }
@@ -66,6 +68,16 @@ SCENARIO("Testing double based typed message") {
       AND_THEN("restoring to a float is not possible") {
         auto restored = zq::restore_as<float>(tm);
         REQUIRE_FALSE(restored);
+      }
+    }
+    AND_WHEN("Move assign the message") {
+      auto tm = zq::typed_message(num);
+      auto tm2 = zq::typed_message(int{12});
+      tm2 = std::move(tm);
+      THEN("the message can be restored as expected") {
+        auto restored = zq::restore_as<double>(tm2);
+        REQUIRE(restored);
+        REQUIRE_EQ(*restored, num);
       }
     }
   }

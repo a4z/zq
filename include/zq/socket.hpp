@@ -12,8 +12,13 @@
 
 namespace zq {
 
-  // Since socket resets the pointer, this is never called in zq code
-  // but to be technically correct, this deleter is needed for the unique_ptr
+  /**
+   * @brief Deleter for the unique_ptr
+   *
+   * Since socket resets the pointer, this is never called in zq code
+   * but to be technically correct, this deleter is needed for the unique_ptr
+   *
+   */
   struct ZmqSocketClose {
     void operator()(void* ptr) const {
       if (ptr) {
@@ -22,18 +27,27 @@ namespace zq {
     }
   };
 
-  // Concept to check if a type is std::array of Message
+  /// Concept to check if a type is std::array of Message
   template <typename T>
   concept StdArrayOfMessage = requires(T t) {
     requires std::is_same_v<
         decltype(t), std::array<Message, std::tuple_size<decltype(t)>::value>>;
   };
 
+  /// Concept declaring a Message Container
   template <typename T>
   concept MessageContainer =
       std::is_same_v<T, std::vector<Message>> || StdArrayOfMessage<T>;
   ;
 
+  /**
+   * @brief Indicates the result of a receive operation
+   *
+   *  If you read a multipart message, you can get an underflow or overflow.
+   *  Underflow means that not the expected number of messages was received.
+   *  Overflow means that more messages were received than expected.
+   *
+   */
   enum class RecvResult { Ok, Underflow, Overflow };
 
   template <size_t N>
@@ -52,19 +66,30 @@ namespace zq {
     }
   };
 
+  /// @brief  Shortcut for a unique_ptr to a zmq socket
   using SocketPointer = std::unique_ptr<void, ZmqSocketClose>;
 
+  /**
+   * @brief ZMQ Socket wrapper
+   *
+   *  Manages a socket and provides some convenience functions for sending
+   *  and receiving messages. In especially, TypeMessage, but also other forms
+   *  of multipart messages.
+   *  And a single message can also be sent, of course
+   */
   struct Socket {
     SocketPointer socket_ptr{nullptr};
 
+    /// @brief Construct a socket from a pointer
     Socket(SocketPointer socket) noexcept : socket_ptr{std::move(socket)} {};
-
+    /// @brief Move constructor
     Socket(Socket&& rhs) noexcept : socket_ptr{std::move(rhs.socket_ptr)} {}
 
     Socket(Socket const&) = delete;
     Socket& operator=(Socket const&) = delete;
     Socket& operator=(Socket&&) = delete;
 
+    /// @brief Destructor, ensures the socket is closed
     ~Socket() noexcept { [[maybe_unused]] auto _ = close(); }
 
     /**
@@ -72,10 +97,10 @@ namespace zq {
      *
      * @return Error code
      */
-    [[nodiscard]] Error close() noexcept {
+    [[nodiscard]] ZmqErrorNo close() noexcept {
       if (socket_ptr != nullptr) {
         if (zmq_close(socket_ptr.get()) != 0) {
-          return Error{zmq_errno()};
+          return ZmqErrorNo{zmq_errno()};
         }
         [[maybe_unused]] auto _ = socket_ptr.release();
         socket_ptr = nullptr;
@@ -89,10 +114,10 @@ namespace zq {
      * @tparam Messages
      * @param first
      * @param messages
-     * @return tl::expected<size_t, ErrMsg> Number of bytes sent, or an error
+     * @return tl::expected<size_t, ZmqError> Number of bytes sent, or an error
      */
     template <pack_of_messages... Messages>
-    [[nodiscard]] tl::expected<size_t, ErrMsg> send(
+    [[nodiscard]] tl::expected<size_t, ZmqError> send(
         const Message& first,
         const Messages&... messages) {
       size_t bytes_sent = 0;
@@ -101,14 +126,14 @@ namespace zq {
         auto rc = zmq_send(socket_ptr.get(), first.data(), first.size(),
                            ZMQ_DONTWAIT);
         if (rc < 0) {
-          return tl::make_unexpected(currentErrMsg());
+          return tl::make_unexpected(currentZmqError());
         }
         bytes_sent += static_cast<size_t>(rc);
       } else {
         auto rc =
             zmq_send(socket_ptr.get(), first.data(), first.size(), ZMQ_SNDMORE);
         if (rc < 0) {
-          return tl::make_unexpected(currentErrMsg());
+          return tl::make_unexpected(currentZmqError());
         }
         auto maybe_rc = send(messages...);
         if (!maybe_rc) {
@@ -123,9 +148,9 @@ namespace zq {
      * @brief Send a typed message
      *
      * @param msg
-     * @return tl::expected<size_t, ErrMsg>
+     * @return tl::expected<size_t, ZmqError>
      */
-    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const TypedMessage& msg) {
+    [[nodiscard]] tl::expected<size_t, ZmqError> send(const TypedMessage& msg) {
       return send(msg.type, msg.payload);
     }
 
@@ -134,10 +159,10 @@ namespace zq {
      *
      * @tparam Container (std::vector<Message> or std::array<Message, N>)
      * @param msg
-     * @return tl::expected<size_t, ErrMsg>
+     * @return tl::expected<size_t, ZmqError>
      */
     template <MessageContainer Container>
-    [[nodiscard]] tl::expected<size_t, ErrMsg> send(const Container& msg) {
+    [[nodiscard]] tl::expected<size_t, ZmqError> send(const Container& msg) {
       size_t bytes_sent = 0;
       size_t total_messages = msg.size();
       for (size_t i = 0; i < total_messages; ++i) {
@@ -146,7 +171,7 @@ namespace zq {
         auto& m = msg[i];
         auto rc = zmq_send(socket_ptr.get(), m.data(), m.size(), flags);
         if (rc < 0) {
-          return tl::make_unexpected(currentErrMsg());
+          return tl::make_unexpected(currentZmqError());
         }
         bytes_sent += static_cast<size_t>(rc);
       }
@@ -156,13 +181,17 @@ namespace zq {
     /**
      * @brief Return a typed message
      *
-     *  Returns nothing if there is a zmq error
-     *  Returns an error if it does not look like a typed message
+     *  Returns an Error with a ZmqError if there was a ZMQ issue
+     *  Returns an Error with a ZqError if there was no multipart message
+     *  but only a single one.
      *
-     * @return std::optional<tl::expected<TypedMessage, std::runtime_error>>
+     * \note re rec_n or rec_all message are more resilient in
+     * case of messages that have more then two parts. In case it's not 100%
+     * sure TypeMessage is communicated, better use one of them.
+     *
+     * @return std::optional<tl::expected<TypedMessage, Error>>
      */
-    [[nodiscard]] std::optional<tl::expected<TypedMessage, std::runtime_error>>
-    recv() {
+    [[nodiscard]] std::optional<tl::expected<TypedMessage, Error>> recv() {
       TypedMessage typed_message;
 
       auto rc = zmq_msg_recv(std::addressof(typed_message.type.msg),
@@ -172,23 +201,23 @@ namespace zq {
         if (zmq_errno() == EAGAIN) {
           return std::nullopt;
         } else {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
       }
       int more = 0;
       size_t more_size = sizeof(more);
       rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
       if (rc == -1) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       if (more) {
         rc = zmq_msg_recv(std::addressof(typed_message.payload.msg),
                           socket_ptr.get(), 0);
         if (rc == -1) {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
       } else {
-        return tl::make_unexpected(std::runtime_error("no more message"));
+        return tl::make_unexpected(ZqError("no more message"));
       }
 
       return typed_message;
@@ -197,10 +226,9 @@ namespace zq {
     /**
      * @brief Receive as many message parts as there are on the socket
      *
-     * @return std::optional<tl::expected<Message, std::runtime_error>>
+     * @return std::optional<tl::expected<Message, ZmqError>>
      */
-    [[nodiscard]] std::optional<
-        tl::expected<std::vector<Message>, std::runtime_error>>
+    [[nodiscard]] std::optional<tl::expected<std::vector<Message>, ZmqError>>
     recv_all() {
       std::vector<Message> messages;
       int more = 1;
@@ -214,32 +242,35 @@ namespace zq {
           if (zmq_errno() == EAGAIN) {
             return std::nullopt;
           } else {
-            return tl::make_unexpected(currentZmqRuntimeError());
+            return tl::make_unexpected(currentZmqError());
           }
         }
         rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
         if (rc == -1) {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
       }
       return messages;
     }
 
     /**
-     * @brief await a typed message
+     * @brief await a TypedMessage for the given timeout
      *
-     * This function is going to be replaced
+     * Wait for the given timeout, if a message is available,
+     * calls recv and returns the result.
+     *
+     * If no message is available, returns nullopt
      *
      * @param timeout
-     * @return std::optional<tl::expected<TypedMessage, std::runtime_error>>
+     * @return std::optional<tl::expected<TypedMessage, Error>>
      */
-    [[nodiscard]] std::optional<tl::expected<TypedMessage, std::runtime_error>>
-    await(std::chrono::milliseconds timeout) {
+    [[nodiscard]] std::optional<tl::expected<TypedMessage, Error>> await(
+        std::chrono::milliseconds timeout) {
       zmq_pollitem_t poll_item[] = {{socket_ptr.get(), 0, ZMQ_POLLIN, 0}};
       long tm = static_cast<long>(timeout.count());
       auto rc = zmq_poll(poll_item, 1, tm);
       if (rc == -1) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
 
       return recv();
@@ -251,15 +282,15 @@ namespace zq {
      * Returns true if there is data to receive, false otherwise
      *
      * @param timeout
-     * @return tl::expected<bool, std::runtime_error>
+     * @return tl::expected<bool, ZmqError>
      */
-    [[nodiscard]] tl::expected<bool, std::runtime_error> poll(
+    [[nodiscard]] tl::expected<bool, ZmqError> poll(
         std::chrono::milliseconds timeout) {
       zmq_pollitem_t poll_item[] = {{socket_ptr.get(), 0, ZMQ_POLLIN, 0}};
       long tm = static_cast<long>(timeout.count());
       auto rc = zmq_poll(poll_item, 1, tm);
       if (rc == -1) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       return rc > 0;
     }
@@ -270,14 +301,11 @@ namespace zq {
      * todo, overflow underflow description here
      *
      * @tparam N
-     * @return std::optional<tl::expected<RecvData<N>, std::runtime_error>>
+     * @return std::optional<tl::expected<RecvData<N>, ZmqError>>
      */
     template <size_t N>
-    auto recv_n()
-        -> std::optional<tl::expected<RecvData<N>, std::runtime_error>> {
+    auto recv_n() -> std::optional<tl::expected<RecvData<N>, ZmqError>> {
       RecvData<N> data{};
-
-      using zq::currentZmqRuntimeError;
 
       auto rc = zmq_msg_recv(std::addressof(data.messages[0].msg),
                              socket_ptr.get(), ZMQ_DONTWAIT);
@@ -286,7 +314,7 @@ namespace zq {
         if (zmq_errno() == EAGAIN) {
           return std::nullopt;
         } else {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
       }
       data.msg_count++;
@@ -297,7 +325,7 @@ namespace zq {
       for (size_t i = 1; i < N; ++i) {
         rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
         if (rc == -1) {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
         if (!more) {
           return data;
@@ -305,14 +333,14 @@ namespace zq {
         rc = zmq_msg_recv(std::addressof(data.messages[i].msg),
                           socket_ptr.get(), 0);
         if (rc == -1) {
-          return tl::make_unexpected(currentZmqRuntimeError());
+          return tl::make_unexpected(currentZmqError());
         }
         data.msg_count++;
       }
       // one more 'more' check for the overflow case is required
       rc = zmq_getsockopt(socket_ptr.get(), ZMQ_RCVMORE, &more, &more_size);
       if (rc == -1) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       if (more) {
         data.msg_count++;
@@ -326,11 +354,14 @@ namespace zq {
   /**
    * @brief Subscribe a subscriber to a list of topics
    *
+   * In case of an error, a ZqError is returned if the given socket is not a
+   * subscriber otherwise, in case of a Zmq error, a ZmqError is returned.
+   *
    * @param subscriber
    * @param topic_filters
-   * @return tl::expected<size_t, std::runtime_error>
+   * @return tl::expected<size_t, Error>
    */
-  [[nodiscard]] inline tl::expected<size_t, std::runtime_error> subscribe(
+  [[nodiscard]] inline tl::expected<size_t, Error> subscribe(
       Socket& subscriber,
       std::initializer_list<std::string_view> topic_filters) {
     // subscribe to all topics, todo, maybe overload this function with 1 or 2
@@ -341,11 +372,10 @@ namespace zq {
       int rc = zmq_getsockopt(subscriber.socket_ptr.get(), ZMQ_TYPE,
                               std::addressof(val), std::addressof(size));
       if (rc != 0) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       if (val != ZMQ_SUB) {
-        return tl::make_unexpected(
-            std::runtime_error("socket is not a subscriber"));
+        return tl::make_unexpected(ZqError("socket is not a subscriber"));
       }
     }
 
@@ -353,7 +383,7 @@ namespace zq {
       auto rc =
           zmq_setsockopt(subscriber.socket_ptr.get(), ZMQ_SUBSCRIBE, "", 0);
       if (rc != 0) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       return std::numeric_limits<size_t>::max();
     }
@@ -363,7 +393,7 @@ namespace zq {
       auto rc = zmq_setsockopt(subscriber.socket_ptr.get(), ZMQ_SUBSCRIBE,
                                t.data(), t.size());
       if (rc != 0) {
-        return tl::make_unexpected(currentZmqRuntimeError());
+        return tl::make_unexpected(currentZmqError());
       }
       topicCount++;
     }

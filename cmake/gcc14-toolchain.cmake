@@ -2,11 +2,11 @@ find_program(GCC_PATH gcc-14)
 find_program(GPP_PATH g++-14)
 
 if(NOT GCC_PATH)
-    message(FATAL_ERROR "gcc-13 not found")
+    message(FATAL_ERROR "${GCC_PATH} not found")
 endif()
 
 if(NOT GPP_PATH)
-    message(FATAL_ERROR "g++-13 not found")
+    message(FATAL_ERROR "GPP_PATH not found")
 endif()
 
 

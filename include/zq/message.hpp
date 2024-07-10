@@ -12,9 +12,14 @@ namespace zq {
   // std::string as a typename does not always work,
   // might be std::string, or class std::basic_string<char,struct
   // std::char_traits<char>,class std::allocator<char> >> depending on the
-  // platform, therefore a typename that firs into SSO is choosen
+  // platform, therefore a typename that fits into SSO is choosen
   static inline const auto str_type_name = "zq::str";
 
+  /**
+   * @brief Wrapper for a zmq_msg_t message
+   *
+   * A RAII interface. Plus some convenience functions.
+   */
   struct Message {
     zmq_msg_t msg;
 
@@ -39,8 +44,8 @@ namespace zq {
       [[maybe_unused]] auto r = zmq_msg_close(std::addressof(msg));
       if (r != 0) {
         if constexpr (debug_build) {
-          auto ce = currentErrMsg();
-          std::cerr << "zmq_msg_close: " << ce.error << ", " << ce.message
+          auto ce = currentZmqError();
+          std::cerr << "zmq_msg_close: " << ce.errNo << ", " << ce.what()
                     << std::endl;
         }
       }
@@ -54,8 +59,8 @@ namespace zq {
       [[maybe_unused]] auto r = zmq_msg_close(std::addressof(msg));
       if (r != 0) {
         if constexpr (debug_build) {
-          auto ce = currentErrMsg();
-          std::cerr << "zmq_msg_close: " << ce.error << ", " << ce.message
+          auto ce = currentZmqError();
+          std::cerr << "zmq_msg_close: " << ce.errNo << ", " << ce.what()
                     << std::endl;
         }
       }
@@ -72,6 +77,14 @@ namespace zq {
     }
   };
 
+  /**
+   * @brief Aultipart message, composed from the type and a payload
+   *
+   * The type is a string (message), the payload is the serialized data.
+   * By sending this to the other side, the other side can restore the
+   * payload to the original type
+   *
+   */
   struct TypedMessage {
     Message type;
     Message payload;
@@ -154,7 +167,7 @@ namespace zq {
   // restore typed messages
 
   template <typename T>
-  using restore_result = tl::expected<T, std::runtime_error>;
+  using restore_result = tl::expected<T, ZqError>;
 
   // This is the default template function for restore_as.
   // Will trigger a static assert for unsupported types
@@ -170,8 +183,7 @@ namespace zq {
       -> restore_result<std::string> {
     const auto having_name = as_string_view(msg.type);
     if (having_name != str_type_name) {
-      return tl::make_unexpected(
-          std::runtime_error("Message type does not match"));
+      return tl::make_unexpected(ZqError("Message type does not match"));
     }
     return as_string(msg.payload);
   }
@@ -193,7 +205,7 @@ namespace zq {
     };
 
     auto unexpected = [](std::string_view err_msg) {
-      return tl::make_unexpected(std::runtime_error(std::string{err_msg}));
+      return tl::make_unexpected(ZqError(err_msg.data()));
     };
 
     if (!check_type_name()) {

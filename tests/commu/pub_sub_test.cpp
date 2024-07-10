@@ -93,3 +93,27 @@ SCENARIO("Publish and subscribe with filter") {
     }
   }
 }
+
+SCENARIO("Wrong subscriber call") {
+  auto context = zq::mk_context();
+  REQUIRE(context);
+
+  GIVEN("a request, a reply socket") {
+    auto [client, server] = pp_cs_sockets(*context, next_inproc_address());
+
+    WHEN("trying to subscribe the push socket") {
+      auto subscribe_rc = zq::subscribe(client, {"foo", "bar"});
+
+      THEN("an error is returned") {
+        REQUIRE_FALSE(subscribe_rc);
+        zq::Error err = subscribe_rc.error();
+        // this is a logical error on our side, not a internal ZMQ error
+        REQUIRE(err.isZqError());
+        REQUIRE_FALSE(err.isZmqError());
+        const std::string err_msg = err.what();
+        REQUIRE(doctest::Contains{"not a subscr"}.checkWith(err_msg.c_str()));
+
+      }
+    }
+  }
+}

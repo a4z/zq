@@ -133,7 +133,7 @@ SCENARIO(
 
       THEN("The error message is returned") {
         REQUIRE_FALSE(maybe_socket.has_value());
-        const auto err_msg = maybe_socket.error().as_string();
+        const std::string err_msg = maybe_socket.error().what();
         REQUIRE(doctest::Contains{"Bad address"}.checkWith(err_msg.c_str()));
       }
     }

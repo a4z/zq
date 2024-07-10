@@ -3,7 +3,7 @@
 
 SCENARIO("Testing the Error type") {
   GIVEN("an Error instances with value 0") {
-    zq::Error e0{0};
+    zq::ZmqErrorNo e0{0};
     WHEN("comparing ") {
       THEN("with NoError, it is no error") {
         CHECK(e0 == zq::NoError);
@@ -17,7 +17,7 @@ SCENARIO("Testing the Error type") {
     }
   }
   GIVEN("an Error instances with value 1") {
-    zq::Error e1{1};
+    zq::ZmqErrorNo e1{1};
     WHEN("comparing") {
       THEN("with NoError, it is no error") {
         CHECK_FALSE(e1 == zq::NoError);
