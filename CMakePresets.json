@@ -40,8 +40,8 @@
     {
       "inherits": "base",
       "name": "gcc14",
-      "displayName": "Gcc-13",
-      "description": "Gcc-13, Ninja Multi-Config",
+      "displayName": "Gcc-14",
+      "description": "Gcc-14, Ninja Multi-Config",
       "generator": "Ninja Multi-Config",
       "cacheVariables": {
         "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/cmake/gcc14-toolchain.cmake",
