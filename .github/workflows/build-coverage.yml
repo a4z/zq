@@ -1,15 +1,14 @@
 name: CMake Build Coverage
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - never
+# Disable for now, I am tied of constantly breaking coverage because the tools introduce new waring or errors
 #   pull_request:
 #     branches:
 #       - main
-#   workflow_dispatch:
-
-on:
+  workflow_dispatch:
   workflow_call:
 
 env:
