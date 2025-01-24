@@ -3,15 +3,11 @@ name: CMake Build Coverage
 on:
   push:
     branches:
-      - never
-# Disable for now, I am tied of constantly breaking coverage because the tools introduce new waring or errors
-#   pull_request:
-#     branches:
-#       - main
-#   workflow_dispatch:
-
-on:
-  workflow_call:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 env:
   VCPKG_COMMIT_ID: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'

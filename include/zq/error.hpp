@@ -84,6 +84,8 @@ namespace zq {
         : std::runtime_error(std::to_string(en.value()) + std::string{": "} +
                              msg.data()),
           errNo(en) {}
+
+    ~ZmqError() = default;
   };
 
   /**
