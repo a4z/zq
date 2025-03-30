@@ -85,7 +85,6 @@ namespace zq {
                              msg.data()),
           errNo(en) {}
 
-    ~ZmqError() = default;
   };
 
   /**
