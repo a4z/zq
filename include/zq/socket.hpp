@@ -9,6 +9,7 @@
 #include <chrono>
 #include <memory>
 #include <string_view>
+#include <vector>
 
 namespace zq {
 
