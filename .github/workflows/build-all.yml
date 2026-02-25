@@ -9,9 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  VCPKG_COMMIT_ID: 'ad25766aefb5313b6bc4e2a4b78a2946f84fbf66'
-
 jobs:
   build_and_test:
     name: ${{ matrix.os }}-${{ github.workflow }}
@@ -22,13 +19,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            cmake_preset: msvc22
-            # extra_args: -D ZQ_WITH_PROTO=OFF
-            # there was this odd error that could not be reproduced locally on Windos 10 or 11
-            #  -> Running cpp protocol buffer compiler on D:/a/zq/zq/proto/pingpong.proto
-            # The system cannot find the batch label specified - VCEnd
-            # error MSB8066
-            # need to look into it extra ,but for now, disable proto on Windows
+            cmake_preset: msvc26
           - os: ubuntu-latest
             cmake_preset: ninja
           - os: macos-latest
@@ -50,23 +41,13 @@ jobs:
 
       - uses: lukka/get-cmake@latest
         with:
-          cmakeVersion: "~3.29.0"
+          cmakeVersion: "~4.0.0"
           ninjaVersion: "^1.12.0"
 
-      # it's not good to not test proto on Windows, but that accelerates the build for Windows
-      # - name: Remove protobuf from vcpkg.json on Windows
-      #   run: |
-      #     (Get-Content -path vcpkg.json) | Where-Object { $_ -notmatch '^\s*"protobuf",\s*$' } | Set-Content -Path vcpkg.json
-      #   shell: pwsh
-      #   if: matrix.os == 'windows-latest'
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        id: runvcpkg
-        with:
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
-          vcpkgJsonGlob: 'vcpkg.json'
+      - name: Update vcpkg
+        shell: bash
+        run: git -C "$VCPKG_INSTALLATION_ROOT" pull
 
       - name: Configure CMake
         run: |

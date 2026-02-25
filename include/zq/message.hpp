@@ -167,7 +167,7 @@ namespace zq {
   // restore typed messages
 
   template <typename T>
-  using restore_result = tl::expected<T, ZqError>;
+  using restore_result = std::expected<T, ZqError>;
 
   // This is the default template function for restore_as.
   // Will trigger a static assert for unsupported types
@@ -183,7 +183,7 @@ namespace zq {
       -> restore_result<std::string> {
     const auto having_name = as_string_view(msg.type);
     if (having_name != str_type_name) {
-      return tl::make_unexpected(ZqError("Message type does not match"));
+      return std::unexpected(ZqError("Message type does not match"));
     }
     return as_string(msg.payload);
   }
@@ -205,7 +205,7 @@ namespace zq {
     };
 
     auto unexpected = [](std::string_view err_msg) {
-      return tl::make_unexpected(ZqError(err_msg.data()));
+      return std::unexpected(ZqError(err_msg.data()));
     };
 
     if (!check_type_name()) {

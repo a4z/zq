@@ -1,11 +1,13 @@
 {
   "dependencies": [
+    "common-compiler-warnings",
     "astr",
     "doctest",
-    "tl-expected",
     {
       "name": "zeromq",
-      "features": [ "websockets" ]
+      "features": [
+        "websockets"
+      ]
     }
   ]
 }
