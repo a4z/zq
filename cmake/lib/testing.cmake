@@ -1,11 +1,5 @@
 include_guard(GLOBAL)
 
-# include(simpletargets)
-
-
-# this is obviously a requirements, tests...
-# TODO , find that file, in test and tests
-# add_library(doctest_main OBJECT ${PROJECT_SOURCE_DIR}/tests/test_main.cpp)
 
 find_package(doctest CONFIG REQUIRED)
 
@@ -30,7 +24,7 @@ function (add_doctest NAME)
     add_executable(${NAME} ${D_TEST_SOURCES})
     target_link_libraries(${NAME} doctest_main)
 
-    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq zq_default::flags)
+    target_link_libraries(${NAME} ${TEST_FRAMEWORK} zq a4z::commonCompilerWarnings)
     if (ZQ_WITH_PROTO)
         target_link_libraries(${NAME} zqproto)
     endif()
