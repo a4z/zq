@@ -45,10 +45,6 @@ jobs:
           ninjaVersion: "^1.12.0"
 
 
-      - name: Update vcpkg
-        shell: bash
-        run: git -C "$VCPKG_INSTALLATION_ROOT" pull
-
       - name: Configure CMake
         run: |
           cmake --version
