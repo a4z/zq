@@ -45,6 +45,10 @@ jobs:
           ninjaVersion: "^1.12.0"
 
 
+      - name: Fetch vcpkg baseline
+        shell: bash
+        run: git -C "$VCPKG_INSTALLATION_ROOT" fetch
+
       - name: Configure CMake
         run: |
           cmake --version

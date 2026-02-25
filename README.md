@@ -39,11 +39,9 @@ After the project has been built, you are ready to run the tests:
 ctest --preset=<name>
 ```
 
-
-
 ## GitDiagram
 
-Generated via: https://gitdiagram.com/a4z/zq
+Generated via: <https://gitdiagram.com/a4z/zq>
 
 ```mermaid
 graph TB
@@ -143,4 +141,4 @@ graph TB
 
 ```
 
-😊 
+😊

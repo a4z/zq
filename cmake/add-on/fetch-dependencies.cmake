@@ -1,6 +1,13 @@
 
 include(FetchContent)
 FetchContent_Declare(
+  astr
+  GIT_REPOSITORY https://github.com/a4z/astr.git
+  GIT_TAG v0.3.1
+  OVERRIDE_FIND_PACKAGE
+)
+
+FetchContent_Declare(
   commonCompilerWarnings
   GIT_REPOSITORY https://github.com/a4z/commonCompilerWarnings.git
   GIT_TAG main
@@ -11,7 +18,7 @@ FetchContent_Declare(
   doctest
   SYSTEM
   GIT_REPOSITORY "https://github.com/onqtam/doctest"
-  GIT_TAG "v2.4.12"
+  GIT_TAG "dev"
   OVERRIDE_FIND_PACKAGE
 )
 
