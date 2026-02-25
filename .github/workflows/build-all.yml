@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: windows-latest
-            cmake_preset: msvc26
+            cmake_preset: msvc22
           - os: ubuntu-latest
             cmake_preset: ninja
           - os: macos-latest
